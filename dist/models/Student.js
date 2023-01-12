@@ -14,6 +14,10 @@ const StudentSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    temporaryStudentPassword: {
+        type: String,
+        required: false
+    },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("Student", StudentSchema);
 //# sourceMappingURL=Student.js.map

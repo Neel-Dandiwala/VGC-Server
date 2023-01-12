@@ -65,11 +65,10 @@ const studentSignUp = async (req, res) => {
             return { logs };
         }
         let randomPassword = Math.random().toString(36).substring(2, 8);
-        const hashedPassword = await argon2_1.default.hash(randomPassword);
         const _student = new Student_1.default({
             _id: studentId,
             studentCollegeId: studentId,
-            studentPassword: hashedPassword,
+            studentPassword: randomPassword,
         });
         let result;
         try {
@@ -104,7 +103,7 @@ const studentSignUp = async (req, res) => {
             });
             var mailOptions = {
                 from: "vgcoins321@gmail.com",
-                to: "nddandiwala_b19@it.vjti.ac.in",
+                to: studentExist.studentMailId,
                 subject: "Hello from VGC",
                 text: "Your password is " + randomPassword,
                 headers: { 'x-myheader': 'test header' }
@@ -188,27 +187,51 @@ const studentLogIn = async (req, res) => {
                 throw new Error(err);
             }
         }
-        const valid = await argon2_1.default.verify(_student.studentPassword, studentPassword);
-        if (valid) {
-            req.session.authenticationID = (_student._id).toString();
-            logs = [
-                {
-                    field: "Successful Log In",
-                    message: _student._id,
-                }
-            ];
-            res.status(200).json({ logs });
-            return { logs };
+        if (_student.studentPassword.startsWith("$argon")) {
+            const valid = await argon2_1.default.verify(_student.studentPassword, studentPassword);
+            if (valid) {
+                req.session.authenticationID = (_student._id).toString();
+                logs =
+                    {
+                        field: "Normal Login",
+                        message: _student._id,
+                    };
+                res.status(200).json(logs);
+                return { logs };
+            }
+            else {
+                logs = [
+                    {
+                        field: "Password",
+                        message: "Incorrect password",
+                    }
+                ];
+                res.status(400).json({ logs });
+                return { logs };
+            }
         }
         else {
-            logs = [
-                {
-                    field: "Password",
-                    message: "Incorrect password",
-                }
-            ];
-            res.status(400).json({ logs });
-            return { logs };
+            const valid = (_student.studentPassword === studentPassword);
+            if (valid) {
+                req.session.authenticationID = (_student._id).toString();
+                logs =
+                    {
+                        field: "First Login",
+                        message: _student._id,
+                    };
+                res.status(200).json(logs);
+                return { logs };
+            }
+            else {
+                logs = [
+                    {
+                        field: "Password",
+                        message: "Incorrect password",
+                    }
+                ];
+                res.status(400).json({ logs });
+                return { logs };
+            }
         }
     }
     catch (e) {

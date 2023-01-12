@@ -63,6 +63,7 @@ const main = async () => {
 
     app.use(express.json());
     app.use(require('./routes/StudentRoutes'));
+    app.use(require('./routes/QRRoutes'));
 
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");

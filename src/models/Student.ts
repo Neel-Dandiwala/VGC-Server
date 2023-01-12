@@ -17,6 +17,11 @@ const StudentSchema: Schema = new Schema({
         required: true
     },
 
+    temporaryStudentPassword:  {
+        type: String,
+        required: false
+    },
+
 }, {timestamps: true})
 
 export default model<StudentInfo>("Student", StudentSchema);
