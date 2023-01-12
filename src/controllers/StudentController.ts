@@ -1,26 +1,16 @@
 import { Request, Response } from 'express';
-import User from '../models/Student';
 import { StudentInfo } from '../types/StudentInfo';
 import Student from '../models/Student';
 import { ResponseFormat } from "../resolvers/Format";
-import { validation } from "../utils/validation";
 import argon2 from "argon2";
 import {connection} from "../connection";
-import { CredentialsInput } from "../utils/CredentialsInput";
 import {MongoServerError} from 'mongodb'
 import * as nodemailer from 'nodemailer' 
 require('dotenv').config()
 
-class UserResponse {
-    logs?: ResponseFormat[];
-    user?: StudentInfo;
-}
+
 
 // const collection = connection.db('rrrdatabase').collection('test');
-
-// @desc   Get User
-// @route  GET /user/login
-// @access Private
 const studentSignUp = async(req:Request, res:Response) => {
 
     console.log(req)

@@ -32,8 +32,6 @@ const connection_1 = require("../connection");
 const mongodb_1 = require("mongodb");
 const nodemailer = __importStar(require("nodemailer"));
 require('dotenv').config();
-class UserResponse {
-}
 const studentSignUp = async (req, res) => {
     console.log(req);
     const db = await connection_1.connection.getDb();
