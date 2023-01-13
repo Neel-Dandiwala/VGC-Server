@@ -11,7 +11,7 @@ import { uploadOnImgur } from '../imgur';
 require('dotenv').config()
 
 
-const uploadImage = async(req:Request, res:Response) => {
+const uploadImageTrial = async(req:Request, res:Response) => {
     // console.log(req.file, req.body)
     let logs = {
         field: "Image Uploaded",
@@ -104,5 +104,5 @@ const AdminGetEvents = async (req: Request, res: Response) => {
 
 
 module.exports = {
-    AdminPostController, AdminGetEvents, uploadImage
+    AdminPostController, AdminGetEvents, uploadImageTrial
 }

@@ -17,6 +17,11 @@ const AdvertisementSchema: Schema = new Schema({
         required: true
     },
 
+    advertisementImageLink:  {
+        type: String,
+        required: true
+    },
+
 }, {timestamps: true})
 
 export default model<AdvertisementInfo>("Advertisement", AdvertisementSchema);

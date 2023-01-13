@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const connection_1 = require("../connection");
 const imgur_1 = require("../imgur");
 require('dotenv').config();
-const uploadImage = async (req, res) => {
+const uploadImageTrial = async (req, res) => {
     let logs = {
         field: "Image Uploaded",
         message: req.file
@@ -82,6 +82,6 @@ const AdminGetEvents = async (req, res) => {
     }
 };
 module.exports = {
-    AdminPostController, AdminGetEvents, uploadImage
+    AdminPostController, AdminGetEvents, uploadImageTrial
 };
 //# sourceMappingURL=AdminController.js.map

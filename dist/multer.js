@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.upload = void 0;
+exports.uploadCertificate = exports.uploadImage = void 0;
 const multer = require("multer");
-const multerStorage = multer.diskStorage({
+const imageMulterStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, "public");
     },
@@ -11,7 +11,7 @@ const multerStorage = multer.diskStorage({
         cb(null, `temp.${ext}`);
     },
 });
-const multerFilter = (req, file, cb) => {
+const imageMulterFilter = (req, file, cb) => {
     if (file.mimetype.split("/")[1] === "png" || file.mimetype.split("/")[1] === "jpeg" || file.mimetype.split("/")[1] === "jpg") {
         cb(null, true);
     }
@@ -19,8 +19,29 @@ const multerFilter = (req, file, cb) => {
         cb(new Error("Not an image!"), false);
     }
 };
-exports.upload = multer({
-    storage: multerStorage,
-    fileFilter: multerFilter,
+exports.uploadImage = multer({
+    storage: imageMulterStorage,
+    fileFilter: imageMulterFilter,
+});
+const certificateMulterStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public");
+    },
+    filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `temp.${ext}`);
+    },
+});
+const certificateMulterFilter = (req, file, cb) => {
+    if (file.mimetype.split("/")[1] === "png" || file.mimetype.split("/")[1] === "jpeg" || file.mimetype.split("/")[1] === "jpg" || file.mimetype.split("/")[1] === "pdf") {
+        cb(null, true);
+    }
+    else {
+        cb(new Error("Not a valid type!"), false);
+    }
+};
+exports.uploadCertificate = multer({
+    storage: certificateMulterStorage,
+    fileFilter: certificateMulterFilter,
 });
 //# sourceMappingURL=multer.js.map

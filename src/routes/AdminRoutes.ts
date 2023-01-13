@@ -1,14 +1,14 @@
 import express from 'express';
-import { upload } from '../multer'
+import { uploadImage } from '../multer'
 
-const { AdminPostController ,AdminGetEvents, uploadImage} = require('../controllers/AdminController')
+const { AdminPostController ,AdminGetEvents, uploadImageTrial} = require('../controllers/AdminController')
 
 const router = express.Router();
 
-router.post('/admin/postevent', upload.single('file'), AdminPostController)
+router.post('/admin/postevent', uploadImage.single('file'), AdminPostController)
 router.get('/admin/getevents', AdminGetEvents)
 // router.post('/imagetrial', ImageTrial)
 
-router.post('/uploadimage', upload.single('file'), uploadImage);
+router.post('/uploadimage', uploadImage.single('file'), uploadImageTrial);
 
 module.exports = router;
