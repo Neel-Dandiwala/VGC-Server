@@ -52,7 +52,7 @@ const main = async () => {
     app.use(require('./routes/QRRoutes'));
     app.use(require('./routes/AdminRoutes'));
     app.use(fileUpload());
-    app.get("/healthz", (_, res) => {
+    app.head("/healthz", (_, res) => {
         res.send("Health Checkup");
     });
     app.listen(PORT, () => {
