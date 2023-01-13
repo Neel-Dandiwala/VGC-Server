@@ -17,9 +17,7 @@ const QRCodeGenerator = async (req, res) => {
         width: 300,
     });
     console.log(qrCode);
-    res.setHeader("content-type", "image/png");
-    res.status(200);
-    res.send(qrCode);
+    res.status(200).json({});
 };
 module.exports = {
     QRCodeGenerator,

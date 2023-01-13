@@ -68,7 +68,7 @@ const main = async () => {
     app.use(require('./routes/AdminRoutes'));
     app.use(fileUpload());
 
-    app.head("/healthz", (_, res) => {
+    app.get("/healthz", (_, res) => {
         res.send("Health Checkup");
     })
 

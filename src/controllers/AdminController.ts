@@ -429,6 +429,61 @@ const flushCanteen =  async(req: Request, res:Response) => {
     }
 }
 
+const flushStationery =  async(req: Request, res:Response) => {
+    console.log(req)
+    let logs;
+    const db = await connection.getDb();
+    let collection;
+    try {
+        collection = db.collection('rewarder');
+        let _stationery = await collection.findOne({ _id:  'stationery' })
+        let _flushed = await collection.updateOne({ _id:  'stationery' },
+            { $set: { balance: 0 }});
+        collection = db.collection('global');
+        let conversion_rate = await collection.findOne({ _id:  'conversion_rate' })
+        let _expenditure = await collection.updateOne({ _id:  'total_expenditure' },
+            { $inc: { value: (parseFloat(conversion_rate.value) * parseFloat(_stationery.balance)) }});
+
+        if(_flushed.acknowledged && _expenditure.acknowledged) {
+            logs = { 
+                field: "Successful stationery Flush",
+                message: "stationery Balance FLushed and INR deducted"
+            }
+            await collection.updateOne({ _id:  'total_money_left' },
+            { $inc: { value: (-1 * parseFloat(conversion_rate.value) * parseFloat(_stationery.balance)) }});
+            res.status(200).json({ logs });
+            return 
+        } else if(!_flushed.acknowledged && _expenditure.acknowledged) {
+            collection = db.collection('global');
+            await collection.updateOne({ _id:  'total_expenditure' },
+            { $inc: { value: (-1 * parseFloat(conversion_rate.value) * parseFloat(_stationery.balance)) }});
+            logs = { 
+                field: "Failed stationery Flush",
+                message: "Could not flush stationery balance"
+            }
+            res.status(400).json(logs);
+        } else if(_flushed.acknowledged && !_expenditure.acknowledged) {
+            collection = db.collection('rewarder');
+            await collection.updateOne({ _id:  'stationery' }, { $set: { value: _stationery.balance }});
+            logs = { 
+                field: "Failed stationery Flush",
+                message: "Could not modify expenditure INR"
+            }
+            res.status(400).json(logs);
+        } else {
+            logs = { 
+                field: "Failed stationery Flush",
+                message: "Could not flush stationery balance & Could not modify expenditure INR"
+            }
+            res.status(400).json(logs);
+        }
+        
+    } catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+}
+
 module.exports = {
-    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen
+    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery
 }
