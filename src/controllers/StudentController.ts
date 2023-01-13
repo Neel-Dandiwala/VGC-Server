@@ -196,12 +196,13 @@ const studentLogIn = async(req:Request, res:Response) => {
             if(_student.studentPassword.startsWith("$argon")){
                 const valid = await argon2.verify(_student.studentPassword, studentPassword);
                 if (valid) {
-
+                    collection = db.collection( 'it_cs_students' );
+                    let _studentDetails = await collection.findOne({ _id: studentId })
                     req.session.authenticationID = (_student._id).toString();
                     logs =
                         {
                             field: "Normal Login",
-                            message: _student._id,
+                            message: _studentDetails,
                         }
 
                     res.status(200).json( logs );
@@ -220,12 +221,13 @@ const studentLogIn = async(req:Request, res:Response) => {
             } else {
                 const valid = (_student.studentPassword === studentPassword);
                 if (valid) {
-
+                    collection = db.collection( 'it_cs_students' );
+                    let _studentDetails = await collection.findOne({ _id: studentId })
                     req.session.authenticationID = (_student._id).toString();
                     logs =
                         {
                             field: "First Login",
-                            message: _student._id,
+                            studentDetails: _studentDetails,
                         }
 
                     res.status(200).json( logs );

@@ -98,7 +98,7 @@ const studentSignUp = async (req, res) => {
                 secure: true,
                 auth: {
                     user: 'vgcoins321@gmail.com',
-                    pass: 'qvvmzcganvpuajsr',
+                    pass: 'rtbdibujphwjsslf',
                 },
             });
             var mailOptions = {
@@ -190,11 +190,13 @@ const studentLogIn = async (req, res) => {
         if (_student.studentPassword.startsWith("$argon")) {
             const valid = await argon2_1.default.verify(_student.studentPassword, studentPassword);
             if (valid) {
+                collection = db.collection('it_cs_students');
+                let _studentDetails = await collection.findOne({ _id: studentId });
                 req.session.authenticationID = (_student._id).toString();
                 logs =
                     {
                         field: "Normal Login",
-                        message: _student._id,
+                        message: _studentDetails,
                     };
                 res.status(200).json(logs);
                 return { logs };
@@ -213,11 +215,13 @@ const studentLogIn = async (req, res) => {
         else {
             const valid = (_student.studentPassword === studentPassword);
             if (valid) {
+                collection = db.collection('it_cs_students');
+                let _studentDetails = await collection.findOne({ _id: studentId });
                 req.session.authenticationID = (_student._id).toString();
                 logs =
                     {
                         field: "First Login",
-                        message: _student._id,
+                        studentDetails: _studentDetails,
                     };
                 res.status(200).json(logs);
                 return { logs };

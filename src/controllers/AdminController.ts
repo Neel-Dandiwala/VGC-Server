@@ -66,13 +66,7 @@ const AdminGetEvents = async (req: Request, res: Response) => {
 
 }
 
-const ImageTrial = async (req: Request, res: Response) => {
-    // console.log(req);
-    console.log(req)
-    res.status(200).json({ message: "Hi" })
-}
-
 
 module.exports = {
-    AdminPostController, AdminGetEvents, ImageTrial
+    AdminPostController, AdminGetEvents
 }

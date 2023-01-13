@@ -9,6 +9,7 @@ const express_session_1 = __importDefault(require("express-session"));
 const connect_mongodb_session_1 = __importDefault(require("connect-mongodb-session"));
 const cors_1 = __importDefault(require("cors"));
 const connection_1 = require("./connection");
+const fileUpload = require('express-fileupload');
 require('dotenv').config();
 const main = async () => {
     const PORT = process.env.PORT || 3000;
@@ -48,6 +49,9 @@ const main = async () => {
     app.use(express_1.default.json());
     app.use(require('./routes/StudentRoutes'));
     app.use(require('./routes/QRRoutes'));
+    app.use(require('./routes/AdminRoutes'));
+    app.use(require('./routes/ImageRoutes'));
+    app.use(fileUpload());
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");
     });

@@ -4,6 +4,7 @@ import session from "express-session";
 import { default as connectMongoDBSession } from 'connect-mongodb-session';
 import cors from "cors";
 import { connection } from "./connection";
+const fileUpload = require('express-fileupload');
 require('dotenv').config()
 
 declare module 'express-session' {
@@ -64,6 +65,9 @@ const main = async () => {
     app.use(express.json());
     app.use(require('./routes/StudentRoutes'));
     app.use(require('./routes/QRRoutes'));
+    app.use(require('./routes/AdminRoutes'));
+    app.use(require('./routes/ImageRoutes'));
+    app.use(fileUpload());
 
     app.get("/healthz", (_, res) => {
         res.send("Health Checkup");

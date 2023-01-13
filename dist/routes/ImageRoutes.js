@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const { AdminPostController, AdminGetEvents } = require('../controllers/AdminController');
+const multer_1 = require("../multer");
+const { uploadImage, uploadImageSecond } = require('../controllers/ImageController');
 const router = express_1.default.Router();
-router.post('/admin/postevent', AdminPostController);
-router.get('/admin/getevents', AdminGetEvents);
+router.post('/testimage', multer_1.upload.single('file'), uploadImage);
 module.exports = router;
-//# sourceMappingURL=AdminRoutes.js.map
+//# sourceMappingURL=ImageRoutes.js.map
