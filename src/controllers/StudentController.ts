@@ -94,7 +94,7 @@ const studentSignUp = async(req:Request, res:Response) => {
                 secure: true,
                 auth: {
                     user: 'vgcoins321@gmail.com',
-                    pass: 'qvvmzcganvpuajsr',
+                    pass: 'rtbdibujphwjsslf',
                 },
             });
     
