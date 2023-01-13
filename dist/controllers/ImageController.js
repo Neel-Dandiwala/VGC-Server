@@ -2,12 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 const uploadImage = async (req, res) => {
-    res.status(200).json({});
-};
-const uploadImageSecond = async (req, res) => {
-    res.status(200).json({});
+    let logs = {
+        field: "Image Uploaded",
+        message: req.file
+    };
+    res.status(200).json({ logs });
 };
 module.exports = {
-    uploadImage, uploadImageSecond
+    uploadImage
 };
 //# sourceMappingURL=ImageController.js.map

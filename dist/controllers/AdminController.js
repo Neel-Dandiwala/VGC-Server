@@ -1,30 +1,65 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const connection_1 = require("../connection");
+const imgur_1 = require("../imgur");
 require('dotenv').config();
+const uploadImage = async (req, res) => {
+    let logs = {
+        field: "Image Uploaded",
+        message: req.file
+    };
+    res.status(200).json({ logs });
+};
 const AdminPostController = async (req, res) => {
-    console.log("Inside Admin post controller");
+    let logs;
     console.log(req.body);
     const eventData = req.body;
+    const _filename = req.file.filename;
+    try {
+        let _link = await (0, imgur_1.uploadOnImgur)(_filename);
+        eventData.file = _link;
+    }
+    catch (err) {
+        logs = {
+            field: "Imgur Error",
+            message: "Better check with administrator"
+        };
+        res.status(400).json(logs);
+        return;
+    }
     const db = await connection_1.connection.getDb();
     let collection;
     try {
         collection = db.collection('admin_posts');
         let _admin_post;
         try {
-            _admin_post = await collection.insertOne(req.body);
-            console.log(_admin_post);
-            console.log("Admin Post inserted Successfully");
-            return res.status(200).json({ msg: "Admin post added !" });
+            _admin_post = await collection.insertOne(eventData);
+            logs = {
+                field: "Event Posted",
+                eventName: eventData.eventName,
+                eventDescription: eventData.eventDescription,
+                venue: eventData.venue,
+                date: eventData.date,
+                startTime: eventData.startTime,
+                endTime: eventData.endTime,
+                committee: eventData.committee,
+                contact: eventData.contact,
+                file: eventData.file,
+            };
+            return res.status(200).json({ logs });
         }
         catch (e) {
-            console.log(e);
+            logs = {
+                field: "Insertion Error",
+                message: e
+            };
+            return res.status(400).json({ logs });
         }
     }
     catch (e) {
-        console.log(e);
+        res.status(400).json({ e });
+        throw e;
     }
-    res.status(200).json({ message: "Hi" });
 };
 const AdminGetEvents = async (req, res) => {
     console.log(req);
@@ -47,6 +82,6 @@ const AdminGetEvents = async (req, res) => {
     }
 };
 module.exports = {
-    AdminPostController, AdminGetEvents
+    AdminPostController, AdminGetEvents, uploadImage
 };
 //# sourceMappingURL=AdminController.js.map

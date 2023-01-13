@@ -66,7 +66,6 @@ const main = async () => {
     app.use(require('./routes/StudentRoutes'));
     app.use(require('./routes/QRRoutes'));
     app.use(require('./routes/AdminRoutes'));
-    app.use(require('./routes/ImageRoutes'));
     app.use(fileUpload());
 
     app.get("/healthz", (_, res) => {

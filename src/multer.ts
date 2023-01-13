@@ -8,7 +8,7 @@ const multerStorage = multer.diskStorage({
     },
     filename: (req:any, file:any, cb:any) => {
         const ext = file.mimetype.split("/")[1];
-        cb(null, `admin.${ext}`);
+        cb(null, `temp.${ext}`);
     },
 });
 

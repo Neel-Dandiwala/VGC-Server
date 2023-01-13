@@ -41,6 +41,8 @@
     "express-fileupload": "^1.4.0",
     "express-session": "^1.17.3",
     "global": "^4.4.0",
+    "imgur": "^2.2.0",
+    "imgur-uploader": "^4.2.1",
     "mkdirp": "^1.0.4",
     "mongodb": "^4.11.0",
     "mongoose": "^6.8.0",
