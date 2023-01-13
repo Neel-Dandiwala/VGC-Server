@@ -554,7 +554,7 @@ const studentGetApplications = async (req, res) => {
         const db = await connection_1.connection.getDb();
         console.log(db);
         try {
-            allApplications = await db.collection('student_application').find({ studentCollegeId: req.session.authenticationID }).toArray();
+            allApplications = await db.collection('student_application').find({ studentApplicationCollegeId: req.session.authenticationID }).toArray();
         }
         catch (err) {
             if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
@@ -718,15 +718,67 @@ const studentCanteenTransfer = async (req, res) => {
             res.status(400).json({ logs });
             return;
         }
+        let studentBurn;
+        let rewarderMint;
         try {
             collection = db.collection('student');
-            let studentBurn = await collection.updateOne({ _id: studentId }, { $inc: { studentBalance: (-1 * parseInt(_amount)) } });
+            studentBurn = await collection.updateOne({ _id: studentId }, { $inc: { studentBalance: (-1 * parseInt(_amount)) } });
             collection = db.collection('rewarder');
-            let rewarderMint = await collection.updateOne({ _id: 'canteen' }, { $inc: { studentBalance: parseInt(_amount) } });
-            collection = db.collection('global');
-            let globalChange = await collection.updateOne({ _id: 'total' }, { $inc: { studentBalance: parseInt(_amount) } });
+            rewarderMint = await collection.updateOne({ _id: 'canteen' }, { $inc: { balance: parseInt(_amount) } });
         }
-        catch (e) {
+        catch (err) {
+            if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err);
+                logs = {
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                };
+                res.status(400).json({ logs });
+                return { logs };
+            }
+            else {
+                res.status(400).json({ err });
+                throw new Error(err);
+            }
+        }
+        if (studentBurn.acknowledged && rewarderMint.acknowledged) {
+            collection = db.collection('global');
+            await collection.updateOne({ _id: 'total_redeemed' }, { $inc: { value: parseInt(_amount) } });
+            await collection.updateOne({ _id: 'total_in_circulation' }, { $inc: { value: (-1 * parseInt(_amount)) } });
+            logs = {
+                field: "Successful Canteen Transfer",
+                message: "Student paid to Canteen"
+            };
+            res.status(200).json(logs);
+            return { logs };
+        }
+        else if (!studentBurn.acknowledged && rewarderMint.acknowledged) {
+            collection = db.collection('rewarder');
+            rewarderMint = await collection.updateOne({ _id: 'canteen' }, { $inc: { balance: (-1 * parseInt(_amount)) } });
+            logs = {
+                field: "Student Burn Error",
+                message: "Student Balance could not be reduced"
+            };
+            res.status(400).json({ logs });
+            return { logs };
+        }
+        else if (studentBurn.acknowledged && !rewarderMint.acknowledged) {
+            collection = db.collection('student');
+            studentBurn = await collection.updateOne({ _id: studentId }, { $inc: { studentBalance: parseInt(_amount) } });
+            logs = {
+                field: "Rewarder Mint Error",
+                message: "Coins could not be transferred to rewarder"
+            };
+            res.status(400).json({ logs });
+            return { logs };
+        }
+        else {
+            logs = {
+                field: "Rewarder Mint Error & Student Burn Error",
+                message: "Coins could not be transferred to rewarder & Student Balance could not be reduced"
+            };
+            res.status(400).json({ logs });
+            return { logs };
         }
     }
     catch (e) {
@@ -735,6 +787,6 @@ const studentCanteenTransfer = async (req, res) => {
     }
 };
 module.exports = {
-    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements
+    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements, studentCanteenTransfer
 };
 //# sourceMappingURL=StudentController.js.map

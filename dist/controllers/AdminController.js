@@ -38,6 +38,9 @@ const adminSetEvent = async (req, res) => {
     const db = await connection_1.connection.getDb();
     let collection;
     try {
+        collection = db.collection('global');
+        await collection.updateOne({ _id: 'total_money_left' }, { $inc: { value: eventData.eventAmount } });
+        await collection.updateOne({ _id: 'total_investment' }, { $inc: { value: eventData.eventAmount } });
         collection = db.collection('event');
         let _admin_post;
         try {
@@ -110,6 +113,9 @@ const adminSetAdvertisement = async (req, res) => {
     const db = await connection_1.connection.getDb();
     let collection;
     try {
+        collection = db.collection('global');
+        await collection.updateOne({ _id: 'total_money_left' }, { $inc: { value: advertisementData.advertisementAmount } });
+        await collection.updateOne({ _id: 'total_investment' }, { $inc: { value: advertisementData.advertisementAmount } });
         collection = db.collection('advertisement');
         let _admin_post;
         try {
@@ -310,6 +316,58 @@ const getSupplyRedeemed = async (req, res) => {
     }
     catch (e) {
         console.log(e);
+    }
+};
+const flushCanteen = async (req, res) => {
+    console.log(req);
+    let logs;
+    const db = await connection_1.connection.getDb();
+    let collection;
+    try {
+        collection = db.collection('rewarder');
+        let _canteen = await collection.findOne({ _id: 'canteen' });
+        let _flushed = await collection.updateOne({ _id: 'canteen' }, { $set: { value: 0 } });
+        collection = db.collection('global');
+        let conversion_rate = await collection.findOne({ _id: 'conversion_rate' });
+        let _expenditure = await collection.updateOne({ _id: 'total_expenditure' }, { $inc: { value: (parseFloat(conversion_rate.value) * parseFloat(_canteen.balance)) } });
+        if (_flushed.acknowledged && _expenditure.acknowledged) {
+            logs = {
+                field: "Successful Canteen Flush",
+                message: "Canteen Balance FLushed and INR deducted"
+            };
+            await collection.updateOne({ _id: 'total_money_left' }, { $inc: { value: (-1 * parseFloat(conversion_rate.value) * parseFloat(_canteen.balance)) } });
+            res.status(200).json({ logs });
+            return;
+        }
+        else if (!_flushed.acknowledged && _expenditure.acknowledged) {
+            collection = db.collection('global');
+            await collection.updateOne({ _id: 'total_expenditure' }, { $inc: { value: (-1 * parseFloat(conversion_rate.value) * parseFloat(_canteen.balance)) } });
+            logs = {
+                field: "Failed Canteen Flush",
+                message: "Could not flush canteen balance"
+            };
+            res.status(400).json(logs);
+        }
+        else if (_flushed.acknowledged && !_expenditure.acknowledged) {
+            collection = db.collection('rewarder');
+            await collection.updateOne({ _id: 'canteen' }, { $set: { value: _canteen.balance } });
+            logs = {
+                field: "Failed Canteen Flush",
+                message: "Could not modify expenditure INR"
+            };
+            res.status(400).json(logs);
+        }
+        else {
+            logs = {
+                field: "Failed Canteen Flush",
+                message: "Could not flush canteen balance & Could not modify expenditure INR"
+            };
+            res.status(400).json(logs);
+        }
+    }
+    catch (e) {
+        res.status(400).json({ e });
+        throw e;
     }
 };
 module.exports = {
