@@ -865,6 +865,148 @@ const studentCanteenTransfer = async (req: Request, res: Response) => {
     
 }
 
+const studentStationeryTransfer = async (req: Request, res: Response) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs =
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    const _amount = req.body.amount;
+
+    const db = await connection.getDb();
+    let collection = db.collection( 'student' );
+    try {
+
+        const studentId = req.session.authenticationID;
+
+        let _student;
+        try {
+            _student = await collection.findOne({ _id: studentId })
+            if (_student === null){
+                logs =
+                    {
+                        field: "Student Not Found",
+                        message: "Student never signed up before",
+                    }
+                
+            
+                res.status(400).json({ logs });
+                return {logs}; 
+            }
+        } catch(err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = { 
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }
+                res.status(400).json({ logs });
+                return {logs};
+                
+            }
+            else {
+                res.status(400).json({ err });
+                
+                throw new Error(err)
+            }
+        }
+        if (_student.studentBalance < _amount) {
+            logs =
+                    {
+                        field: "Insufficient Student Balance",
+                        message: "Student has balance lower than amount",
+                    }
+                
+            res.status(400).json({ logs });
+            return; 
+        }
+
+        let studentBurn;
+        let rewarderMint;
+
+        try {
+            
+            collection = db.collection('student');
+            studentBurn = await collection.updateOne({ _id:  studentId },
+                { $inc: { studentBalance: (-1 * parseInt(_amount)) }});
+            
+            collection = db.collection('rewarder');
+            rewarderMint = await collection.updateOne({ _id:  'stationery' },
+                { $inc: { balance: parseInt(_amount) }});
+
+        } catch(err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = { 
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }
+                res.status(400).json({ logs });
+                return {logs};
+                
+            }
+            else {
+                res.status(400).json({ err });
+                
+                throw new Error(err)
+            }
+        }
+
+        if(studentBurn.acknowledged && rewarderMint.acknowledged) {
+            collection = db.collection('global');
+            await collection.updateOne({ _id:  'total_redeemed' },
+                { $inc: { value: parseInt(_amount) }});
+            await collection.updateOne({ _id:  'total_in_circulation' },
+                { $inc: { value: (-1 * parseInt(_amount)) }});
+            logs = { 
+                field: "Successful stationery Transfer",
+                message: "Student paid to stationery"
+            }
+            res.status(200).json(logs);
+            return {logs};
+            
+        } else if(!studentBurn.acknowledged && rewarderMint.acknowledged) {
+            collection = db.collection('rewarder');
+            rewarderMint = await collection.updateOne({ _id:  'stationery' },
+                { $inc: { balance: (-1 * parseInt(_amount)) }});
+            logs = { 
+                field: "Student Burn Error",
+                message: "Student Balance could not be reduced"
+            }
+            res.status(400).json({ logs });
+            return {logs};
+        } else if (studentBurn.acknowledged && !rewarderMint.acknowledged) {
+            collection = db.collection('student');
+            studentBurn = await collection.updateOne({ _id:  studentId },
+                { $inc: { studentBalance:  parseInt(_amount) }});
+            logs = { 
+                field: "Rewarder Mint Error",
+                message: "Coins could not be transferred to rewarder"
+            }
+            res.status(400).json({ logs });
+            return {logs};
+        } else {
+            logs = { 
+                field: "Rewarder Mint Error & Student Burn Error",
+                message: "Coins could not be transferred to rewarder & Student Balance could not be reduced"
+            }
+            res.status(400).json({ logs });
+            return {logs};
+        }
+    } catch (e) {
+        console.log(e)
+        throw e
+    }
+    
+}
+
 module.exports = {
-    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements, studentCanteenTransfer
+    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements, studentCanteenTransfer, studentStationeryTransfer
 }

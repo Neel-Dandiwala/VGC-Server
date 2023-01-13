@@ -5,13 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const qrcode_1 = __importDefault(require("qrcode"));
 require('dotenv').config();
-const generateURL = (name, upi) => {
-    return `upi://pay?pa=${upi}&pn=${name}&cu=INR`;
+const generateURL = (name) => {
+    return `http://localhost:3000/student/${name}transfer`;
 };
 const QRCodeGenerator = async (req, res) => {
     const name = req.body.payeeName;
-    const upi = req.body.payeeUpi;
-    const url = generateURL(name, upi);
+    const url = generateURL(name);
     const qrCode = await qrcode_1.default.toDataURL(url, {
         type: "image/png",
         margin: 1,

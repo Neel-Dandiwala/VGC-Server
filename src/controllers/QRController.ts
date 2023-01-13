@@ -9,15 +9,14 @@ import {MongoServerError} from 'mongodb'
 import * as nodemailer from 'nodemailer' 
 require('dotenv').config()
 
-const generateURL = (name: string, upi:string) => {
-    return `upi://pay?pa=${upi}&pn=${name}&cu=INR`;
+const generateURL = (name: string) => {
+    return `http://localhost:3000/student/${name}transfer`;
 };
 
 const QRCodeGenerator = async (req:Request, res:Response) => {
     //TODO: Add validation
     const name = req.body.payeeName;
-    const upi = req.body.payeeUpi;
-    const url = generateURL(name, upi);
+    const url = generateURL(name);
     const qrCode = await QRCode.toDataURL(url, {
       type: "image/png",
       margin: 1,

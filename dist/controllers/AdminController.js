@@ -39,8 +39,8 @@ const adminSetEvent = async (req, res) => {
     let collection;
     try {
         collection = db.collection('global');
-        await collection.updateOne({ _id: 'total_money_left' }, { $inc: { value: eventData.eventAmount } });
-        await collection.updateOne({ _id: 'total_investment' }, { $inc: { value: eventData.eventAmount } });
+        await collection.updateOne({ _id: 'total_money_left' }, { $inc: { value: parseFloat(eventData.eventAmount) } });
+        await collection.updateOne({ _id: 'total_investment' }, { $inc: { value: parseFloat(eventData.eventAmount) } });
         collection = db.collection('event');
         let _admin_post;
         try {
@@ -114,8 +114,8 @@ const adminSetAdvertisement = async (req, res) => {
     let collection;
     try {
         collection = db.collection('global');
-        await collection.updateOne({ _id: 'total_money_left' }, { $inc: { value: advertisementData.advertisementAmount } });
-        await collection.updateOne({ _id: 'total_investment' }, { $inc: { value: advertisementData.advertisementAmount } });
+        await collection.updateOne({ _id: 'total_money_left' }, { $inc: { value: parseFloat(advertisementData.advertisementAmount) } });
+        await collection.updateOne({ _id: 'total_investment' }, { $inc: { value: parseFloat(advertisementData.advertisementAmount) } });
         collection = db.collection('advertisement');
         let _admin_post;
         try {
@@ -326,7 +326,7 @@ const flushCanteen = async (req, res) => {
     try {
         collection = db.collection('rewarder');
         let _canteen = await collection.findOne({ _id: 'canteen' });
-        let _flushed = await collection.updateOne({ _id: 'canteen' }, { $set: { value: 0 } });
+        let _flushed = await collection.updateOne({ _id: 'canteen' }, { $set: { balance: 0 } });
         collection = db.collection('global');
         let conversion_rate = await collection.findOne({ _id: 'conversion_rate' });
         let _expenditure = await collection.updateOne({ _id: 'total_expenditure' }, { $inc: { value: (parseFloat(conversion_rate.value) * parseFloat(_canteen.balance)) } });
@@ -371,6 +371,6 @@ const flushCanteen = async (req, res) => {
     }
 };
 module.exports = {
-    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed
+    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen
 };
 //# sourceMappingURL=AdminController.js.map

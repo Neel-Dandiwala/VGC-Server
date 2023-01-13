@@ -1,6 +1,6 @@
 import express from 'express';
 import { uploadCertificate } from '../multer'
-const { studentSignUp, studentLogIn, me, studentLogOut, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements, studentCanteenTransfer } = require('../controllers/StudentController')
+const { studentSignUp, studentLogIn, me, studentLogOut, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements, studentCanteenTransfer, studentStationeryTransfer } = require('../controllers/StudentController')
 
 const router = express.Router();
 
@@ -15,6 +15,7 @@ router.get('/student/getapplications', studentGetApplications)
 router.get('/student/getevents', studentGetEvents)
 router.get('/student/getadvertisements', studentGetAdvertisements)
 router.post('/student/canteentransfer', studentCanteenTransfer)
+router.post('/student/stationerytransfer', studentStationeryTransfer)
 
 
 module.exports = router;

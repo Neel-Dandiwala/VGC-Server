@@ -48,9 +48,9 @@ const adminSetEvent = async (req: Request, res: Response) => {
     try {
         collection = db.collection('global');
         await collection.updateOne({ _id:  'total_money_left' },
-        { $inc: { value: eventData.eventAmount }});
+        { $inc: { value: parseFloat(eventData.eventAmount) }});
         await collection.updateOne({ _id:  'total_investment' },
-        { $inc: { value: eventData.eventAmount }});
+        { $inc: { value: parseFloat(eventData.eventAmount) }});
 
         collection = db.collection('event');
         let _admin_post;
@@ -134,9 +134,9 @@ const adminSetAdvertisement = async (req: Request, res: Response) => {
     try {
         collection = db.collection('global');
         await collection.updateOne({ _id:  'total_money_left' },
-        { $inc: { value: advertisementData.advertisementAmount }});
+        { $inc: { value: parseFloat(advertisementData.advertisementAmount) }});
         await collection.updateOne({ _id:  'total_investment' },
-        { $inc: { value: advertisementData.advertisementAmount }});
+        { $inc: { value: parseFloat(advertisementData.advertisementAmount) }});
         collection = db.collection('advertisement');
 
         let _admin_post;
@@ -383,7 +383,7 @@ const flushCanteen =  async(req: Request, res:Response) => {
         collection = db.collection('rewarder');
         let _canteen = await collection.findOne({ _id:  'canteen' })
         let _flushed = await collection.updateOne({ _id:  'canteen' },
-            { $set: { value: 0 }});
+            { $set: { balance: 0 }});
         collection = db.collection('global');
         let conversion_rate = await collection.findOne({ _id:  'conversion_rate' })
         let _expenditure = await collection.updateOne({ _id:  'total_expenditure' },
@@ -430,5 +430,5 @@ const flushCanteen =  async(req: Request, res:Response) => {
 }
 
 module.exports = {
-    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed
+    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen
 }

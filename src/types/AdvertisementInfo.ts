@@ -5,6 +5,6 @@ export class AdvertisementInfo {
     advertisementDescription: string;
     advertisementExpires: string;
     advertisementImageLink: string;
-    advertisementAmount: number
+    advertisementAmount: string
 }
 
