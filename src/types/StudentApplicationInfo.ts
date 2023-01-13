@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 
 export class StudentApplicationInfo {
-    studentCollegeId?: string;
+    studentApplicationCollegeId?: string;
     studentApplicationName: string;
     studentApplicationDescription: string;
     studentApplicationDate: string;

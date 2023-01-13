@@ -2,7 +2,7 @@ import { StudentApplicationInfo } from "../types/StudentApplicationInfo";
 import { model, Schema } from "mongoose";
 
 const StudentApplicationSchema: Schema = new Schema({
-    studentCollegeId: {
+    studentApplicationCollegeId: {
         type: String,
         required: true
     },

@@ -517,7 +517,7 @@ const studentSetApplication = async (req: Request, res: Response) => {
         collection = db.collection('student_application');
         let _student_application;
         const _student: StudentApplicationInfo = new StudentApplication({
-            studentCollegeId: req.session.authenticationID,
+            studentApplicationCollegeId: req.session.authenticationID,
             studentApplicationName: studentApplicationData.studentApplicationName,
             studentApplicationDescription: studentApplicationData.studentApplicationDescription,
             studentApplicationDate: studentApplicationData.studentApplicationDate,
@@ -543,11 +543,15 @@ const studentSetApplication = async (req: Request, res: Response) => {
             console.log(_student_application)
             logs = {
                 field: "Student Application Posted",
-                studentApplicationName: studentApplicationData.studentApplicationName,
-                studentApplicationDescription: studentApplicationData.studentApplicationDescription,
-                studentApplicationDate: studentApplicationData.studentApplicationDescription,
-                studentApplicationOrganizer: studentApplicationData.studentApplicationOrganizer,
-                studentApplicationFile: studentApplicationData.studentApplicationFile,
+                studentApplicationCollegeId: _student.studentApplicationCollegeId,
+                studentApplicationName: _student.studentApplicationName,
+                studentApplicationDescription: _student.studentApplicationDescription,
+                studentApplicationDate: _student.studentApplicationDescription,
+                studentApplicationOrganizer: _student.studentApplicationOrganizer,
+                studentApplicationCategory: _student.studentApplicationCategory,
+                studentApplicationFile: _student.studentApplicationFile,
+                studentApplicationStatus: _student.studentApplicationStatus,
+                studentApplicationIssuedCoins: _student.studentApplicationIssuedCoins
             }
             return res.status(200).json({ logs })
         } else {
@@ -719,7 +723,93 @@ const studentGetAdvertisements = async (req: Request, res: Response) => {
 
 }
 
- 
+const studentCanteenTransfer = async (req: Request, res: Response) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs =
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        
+        res.status(400).json({ logs });
+        return null;
+    }
+
+    const _amount = req.body.amount;
+
+    const db = await connection.getDb();
+    let collection = db.collection( 'student' );
+    try {
+
+        const studentId = req.session.authenticationID;
+
+        let _student;
+        try {
+            _student = await collection.findOne({ _id: studentId })
+            if (_student === null){
+                logs =
+                    {
+                        field: "Student Not Found",
+                        message: "Student never signed up before",
+                    }
+                
+            
+                res.status(400).json({ logs });
+                return {logs}; 
+            }
+        } catch(err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = { 
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }
+                res.status(400).json({ logs });
+                return {logs};
+                
+            }
+            else {
+                res.status(400).json({ err });
+                
+                throw new Error(err)
+            }
+        }
+        if (_student.studentBalance < _amount) {
+            logs =
+                    {
+                        field: "Insufficient Student Balance",
+                        message: "Student has balance lower than amount",
+                    }
+                
+            res.status(400).json({ logs });
+            return; 
+        }
+
+        try {
+            
+            collection = db.collection('student');
+            let studentBurn = await collection.updateOne({ _id:  studentId },
+                { $inc: { studentBalance: (-1 * parseInt(_amount)) }});
+            
+            collection = db.collection('rewarder');
+            let rewarderMint = await collection.updateOne({ _id:  'canteen' },
+                { $inc: { studentBalance: parseInt(_amount) }});
+
+            collection = db.collection('global');
+            let globalChange = await collection.updateOne({ _id:  'total' },
+            { $inc: { studentBalance: parseInt(_amount) }});
+
+
+        } catch(e) {
+
+        }
+    } catch (e) {
+        console.log(e)
+        throw e
+    }
+    
+}
 
 module.exports = {
     studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements
