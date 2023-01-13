@@ -7,7 +7,7 @@ const AdvertisementSchema: Schema = new Schema({
         required: true
     },
 
-    advertisementText: {
+    advertisementDescription: {
         type: String,
         required: true
     },

@@ -17,7 +17,7 @@ const AdminPostController = async (req, res) => {
     const _filename = req.file.filename;
     try {
         let _link = await (0, imgur_1.uploadOnImgur)(_filename);
-        eventData.file = _link;
+        eventData.eventFile = _link;
     }
     catch (err) {
         logs = {
@@ -30,7 +30,7 @@ const AdminPostController = async (req, res) => {
     const db = await connection_1.connection.getDb();
     let collection;
     try {
-        collection = db.collection('admin_posts');
+        collection = db.collection('event');
         let _admin_post;
         try {
             _admin_post = await collection.insertOne(eventData);
@@ -38,13 +38,13 @@ const AdminPostController = async (req, res) => {
                 field: "Event Posted",
                 eventName: eventData.eventName,
                 eventDescription: eventData.eventDescription,
-                venue: eventData.venue,
-                date: eventData.date,
-                startTime: eventData.startTime,
-                endTime: eventData.endTime,
-                committee: eventData.committee,
-                contact: eventData.contact,
-                file: eventData.file,
+                eventVenue: eventData.eventVenue,
+                eventDate: eventData.eventDate,
+                eventStartTime: eventData.eventStartTime,
+                eventEndTime: eventData.eventEndTime,
+                eventCommittee: eventData.eventCommittee,
+                eventContact: eventData.eventContact,
+                eventFile: eventData.eventFile,
             };
             return res.status(200).json({ logs });
         }
@@ -69,7 +69,7 @@ const AdminGetEvents = async (req, res) => {
         const db = await connection_1.connection.getDb();
         console.log(db);
         try {
-            allevents = await db.collection('admin_posts').find({}).toArray();
+            allevents = await db.collection('event').find({}).toArray();
             res.status(200).json({ allevents });
             console.log(allevents);
         }

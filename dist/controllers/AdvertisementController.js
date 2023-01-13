@@ -6,11 +6,11 @@ require('dotenv').config();
 const setAdvertisement = async (req, res) => {
     let logs;
     console.log(req.body);
-    const eventData = req.body;
+    const advertisementData = req.body;
     const _filename = req.file.filename;
     try {
         let _link = await (0, imgur_1.uploadOnImgur)(_filename);
-        eventData.file = _link;
+        advertisementData.advertisementImageLink = _link;
     }
     catch (err) {
         logs = {

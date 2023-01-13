@@ -69,6 +69,7 @@ const studentSignUp = async (req, res) => {
             _id: studentId,
             studentCollegeId: studentId,
             studentPassword: randomPassword,
+            studentBalance: -1
         });
         let result;
         try {
@@ -201,6 +202,7 @@ const studentLogIn = async (req, res) => {
                         studentMailId: _studentDetails.studentMailId,
                         studentCollegeId: _studentDetails.studentCollegeId,
                         studentContactNumber: _studentDetails.studentContactNumber,
+                        studentBalance: _student.studentBalance
                     };
                 res.status(200).json(logs);
                 return { logs };
@@ -230,6 +232,7 @@ const studentLogIn = async (req, res) => {
                         studentMailId: _studentDetails.studentMailId,
                         studentCollegeId: _studentDetails.studentCollegeId,
                         studentContactNumber: _studentDetails.studentContactNumber,
+                        studentBalance: _student.studentBalance
                     };
                 res.status(200).json(logs);
                 return { logs };
@@ -358,7 +361,7 @@ const studentChangePassword = async (req, res) => {
             }
         }
         const hashedPassword = await argon2_1.default.hash(studentPassword);
-        let updatedPassword = await collection.updateOne({ _id: studentId }, { $set: { studentPassword: hashedPassword } });
+        let updatedPassword = await collection.updateOne({ _id: studentId }, { $set: { studentPassword: hashedPassword, studentBalance: 0 } });
         if (updatedPassword.acknowledged) {
             logs = [
                 {
@@ -385,7 +388,70 @@ const studentChangePassword = async (req, res) => {
         throw e;
     }
 };
+const studentGetBalance = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ];
+        res.status(400).json({ logs });
+        return null;
+    }
+    const db = await connection_1.connection.getDb();
+    let collection = db.collection('student');
+    try {
+        const studentId = req.session.authenticationID;
+        let _student;
+        try {
+            _student = await collection.findOne({ _id: studentId });
+            if (_student === null) {
+                logs =
+                    {
+                        field: "Student Not Found",
+                        message: "Student never signed up before",
+                    };
+                res.status(400).json({ logs });
+                return { logs };
+            }
+        }
+        catch (err) {
+            if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err);
+                logs = {
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                };
+                res.status(400).json({ logs });
+                return { logs };
+            }
+            else {
+                res.status(400).json({ err });
+                throw new Error(err);
+            }
+        }
+        if (_student.studentBalance === -1) {
+            logs = {
+                field: "Password Change Required",
+                message: "The student has not changed their password yet"
+            };
+            res.status(400).json({ logs });
+            return { logs };
+        }
+        else {
+            logs = _student.studentBalance;
+            res.status(200).json(logs);
+            return { logs };
+        }
+    }
+    catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+};
 module.exports = {
-    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword
+    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance
 };
 //# sourceMappingURL=StudentController.js.map

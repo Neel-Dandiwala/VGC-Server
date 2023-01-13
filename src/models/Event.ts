@@ -12,37 +12,37 @@ const EventSchema: Schema = new Schema({
         required: true
     },
 
-    venue:  {
+    eventVenue:  {
         type: String,
         required: true
     },
 
-    date:  {
+    eventDate:  {
         type: String,
         required: true
     },
 
-    startTime:  {
+    eventStartTime:  {
         type: String,
         required: true
     },
 
-    endTime:  {
+    eventEndTime:  {
         type: String,
         required: true
     },
 
-    committee:  {
+    eventCommittee:  {
         type: String,
         required: true
     },
 
-    contact:  {
+    eventContact:  {
         type: String,
         required: true
     },
 
-    file:  {
+    eventFile:  {
         type: String,
         required: false
     },

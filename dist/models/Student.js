@@ -14,9 +14,9 @@ const StudentSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    temporaryStudentPassword: {
-        type: String,
-        required: false
+    studentBalance: {
+        type: Number,
+        required: true
     },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("Student", StudentSchema);

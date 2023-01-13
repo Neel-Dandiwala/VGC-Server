@@ -17,9 +17,9 @@ const StudentSchema: Schema = new Schema({
         required: true
     },
 
-    temporaryStudentPassword:  {
-        type: String,
-        required: false
+    studentBalance:  {
+        type: Number,
+        required: true
     },
 
 }, {timestamps: true})

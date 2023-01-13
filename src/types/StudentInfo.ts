@@ -4,6 +4,6 @@ export class StudentInfo {
     _id?: string;
     studentCollegeId: string;
     studentPassword: string;
-    temporaryStudentPassword: string;
+    studentBalance: number;
 }
 

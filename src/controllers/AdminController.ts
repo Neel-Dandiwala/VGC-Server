@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { EventInfo } from '../types/EventInfo';
-import AdminPost from '../models/AdminPost';
 // import { ResponseFormat } from "../resolvers/Format";
 // import argon2 from "argon2";
 import { connection } from "../connection";
@@ -25,11 +24,11 @@ const uploadImageTrial = async(req:Request, res:Response) => {
 const AdminPostController = async (req: Request, res: Response) => {
     let logs;
     console.log(req.body)
-    const eventData = req.body  as Pick<EventInfo, "eventName" | "eventDescription" | "venue" | "date" | "startTime" | "endTime" | "committee" | "contact" | "file">
+    const eventData = req.body  as Pick<EventInfo, "eventName" | "eventDescription" | "eventVenue" | "eventDate" | "eventStartTime" | "eventEndTime" | "eventCommittee" | "eventContact" | "eventFile">
     const _filename = req.file.filename
     try {
         let _link = await uploadOnImgur(_filename)
-        eventData.file = _link
+        eventData.eventFile = _link
     } catch(err) {
         logs = {
             field: "Imgur Error",
@@ -43,7 +42,7 @@ const AdminPostController = async (req: Request, res: Response) => {
     let collection;
 
     try {
-        collection = db.collection('admin_posts');
+        collection = db.collection('event');
 
         let _admin_post;
         try {
@@ -53,13 +52,13 @@ const AdminPostController = async (req: Request, res: Response) => {
                 field: "Event Posted",
                 eventName: eventData.eventName,
                 eventDescription: eventData.eventDescription,
-                venue: eventData.venue,
-                date: eventData.date,
-                startTime: eventData.startTime,
-                endTime: eventData.endTime,
-                committee: eventData.committee,
-                contact: eventData.contact,
-                file: eventData.file,
+                eventVenue: eventData.eventVenue,
+                eventDate: eventData.eventDate,
+                eventStartTime: eventData.eventStartTime,
+                eventEndTime: eventData.eventEndTime,
+                eventCommittee: eventData.eventCommittee,
+                eventContact: eventData.eventContact,
+                eventFile: eventData.eventFile,
             }
             return res.status(200).json({ logs })
 
@@ -89,7 +88,7 @@ const AdminGetEvents = async (req: Request, res: Response) => {
         console.log(db)
 
         try {
-            allevents = await db.collection('admin_posts').find({}).toArray();
+            allevents = await db.collection('event').find({}).toArray();
             res.status(200).json({ allevents })
             console.log(allevents)
         } catch (e) {

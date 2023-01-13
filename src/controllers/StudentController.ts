@@ -55,6 +55,7 @@ const studentSignUp = async(req:Request, res:Response) => {
             _id: studentId,
             studentCollegeId: studentId, 
             studentPassword: randomPassword,
+            studentBalance: -1
         })
 
         let result;
@@ -207,6 +208,7 @@ const studentLogIn = async(req:Request, res:Response) => {
                             studentMailId: _studentDetails.studentMailId,
                             studentCollegeId: _studentDetails.studentCollegeId,
                             studentContactNumber: _studentDetails.studentContactNumber,
+                            studentBalance: _student.studentBalance
                         }
 
                     res.status(200).json( logs );
@@ -236,6 +238,7 @@ const studentLogIn = async(req:Request, res:Response) => {
                             studentMailId: _studentDetails.studentMailId,
                             studentCollegeId: _studentDetails.studentCollegeId,
                             studentContactNumber: _studentDetails.studentContactNumber,
+                            studentBalance: _student.studentBalance
                         }
 
                     res.status(200).json( logs );
@@ -377,7 +380,7 @@ const studentChangePassword = async(req:Request, res:Response) => {
             const hashedPassword = await argon2.hash(studentPassword);
             let updatedPassword = await collection.updateOne(
                 { _id:  studentId },
-                { $set: { studentPassword: hashedPassword }}
+                { $set: { studentPassword: hashedPassword, studentBalance: 0 }}
             )
             if(updatedPassword.acknowledged){
                 logs = [
@@ -407,6 +410,76 @@ const studentChangePassword = async(req:Request, res:Response) => {
         }
 }
 
+
+const studentGetBalance = async(req:Request, res:Response) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs = [
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            }
+        ]
+        res.status(400).json({ logs });
+        return null;
+    }
+    const db = await connection.getDb();
+    let collection = db.collection( 'student' );
+        try {
+    
+            const studentId = req.session.authenticationID;
+    
+            let _student;
+            try {
+                _student = await collection.findOne({ _id: studentId })
+                if (_student === null){
+                    logs =
+                        {
+                            field: "Student Not Found",
+                            message: "Student never signed up before",
+                        }
+                    
+                
+                    res.status(400).json({ logs });
+                    return {logs}; 
+                }
+            } catch (err) {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    console.error("# Duplicate Data Found:\n", err)
+                    logs = { 
+                        field: "Unexpected Mongo Error",
+                        message: "Default Message"
+                    }
+                    res.status(400).json({ logs });
+                    return {logs};
+                    
+                }
+                else {
+                    res.status(400).json({ err });
+                    
+                    throw new Error(err)
+                }
+            }
+            if(_student.studentBalance === -1){
+                logs = {
+                    field: "Password Change Required",
+                    message: "The student has not changed their password yet"
+                }
+
+                res.status(400).json({ logs });
+                return { logs };
+            } else {
+                logs = _student.studentBalance
+                res.status(200).json(logs);
+                return { logs };
+            }
+
+        } catch (e) {
+            res.status(400).json({ e });
+            throw e;
+        }
+}
+
 module.exports = {
-    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword
+    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { EventInfo } from '../types/EventInfo';
+import { AdvertisementInfo } from '../types/AdvertisementInfo';
 import AdminPost from '../models/AdminPost';
 // import { ResponseFormat } from "../resolvers/Format";
 // import argon2 from "argon2";
@@ -13,11 +13,11 @@ require('dotenv').config()
 const setAdvertisement = async(req: Request, res:Response) => {
     let logs;
     console.log(req.body)
-    const eventData = req.body  as Pick<EventInfo, "eventName" | "eventDescription" | "venue" | "date" | "startTime" | "endTime" | "committee" | "contact" | "file">
+    const advertisementData = req.body  as Pick<AdvertisementInfo, "advertisementTitle" | "advertisementDescription" | "advertisementExpires" | "advertisementImageLink">
     const _filename = req.file.filename
     try {
         let _link = await uploadOnImgur(_filename)
-        eventData.file = _link
+        advertisementData.advertisementImageLink = _link
     } catch(err) {
         logs = {
             field: "Imgur Error",
