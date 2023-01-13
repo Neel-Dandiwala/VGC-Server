@@ -202,7 +202,11 @@ const studentLogIn = async(req:Request, res:Response) => {
                     logs =
                         {
                             field: "Normal Login",
-                            message: _studentDetails,
+                            _id: _studentDetails._id,
+                            studentName: _studentDetails.studentName,
+                            studentMailId: _studentDetails.studentMailId,
+                            studentCollegeId: _studentDetails.studentCollegeId,
+                            studentContactNumber: _studentDetails.studentContactNumber,
                         }
 
                     res.status(200).json( logs );
@@ -227,7 +231,11 @@ const studentLogIn = async(req:Request, res:Response) => {
                     logs =
                         {
                             field: "First Login",
-                            studentDetails: _studentDetails,
+                            _id: _studentDetails._id,
+                            studentName: _studentDetails.studentName,
+                            studentMailId: _studentDetails.studentMailId,
+                            studentCollegeId: _studentDetails.studentCollegeId,
+                            studentContactNumber: _studentDetails.studentContactNumber,
                         }
 
                     res.status(200).json( logs );
