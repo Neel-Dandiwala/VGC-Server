@@ -40,6 +40,7 @@ const main = async () => {
             maxAge: 1000 * 60 * 60 * 24 * 7,
             httpOnly: true,
             sameSite: 'lax',
+            domain: "http://localhost:3000/",
         },
         store: sessionStore,
         unset: 'destroy',

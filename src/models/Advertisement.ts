@@ -2,7 +2,7 @@ import { AdvertisementInfo } from "../types/AdvertisementInfo";
 import { model, Schema } from "mongoose";
 
 const AdvertisementSchema: Schema = new Schema({
-    advertismentTitle: {
+    advertisementTitle: {
         type: String,
         required: true
     },

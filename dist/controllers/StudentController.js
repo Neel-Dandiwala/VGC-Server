@@ -30,7 +30,9 @@ const Student_1 = __importDefault(require("../models/Student"));
 const argon2_1 = __importDefault(require("argon2"));
 const connection_1 = require("../connection");
 const mongodb_1 = require("mongodb");
+const imgur_1 = require("../imgur");
 const nodemailer = __importStar(require("nodemailer"));
+const StudentApplication_1 = __importDefault(require("../models/StudentApplication"));
 require('dotenv').config();
 const studentSignUp = async (req, res) => {
     console.log(req);
@@ -451,7 +453,212 @@ const studentGetBalance = async (req, res) => {
         throw e;
     }
 };
+const studentSetApplication = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs =
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            };
+        res.status(400).json({ logs });
+        return null;
+    }
+    console.log(req.body);
+    const studentApplicationData = req.body;
+    const _filename = req.file.filename;
+    try {
+        let _link = await (0, imgur_1.uploadOnImgur)(_filename);
+        studentApplicationData.studentApplicationFile = _link;
+    }
+    catch (err) {
+        logs = {
+            field: "Imgur Error",
+            message: "Better check with administrator"
+        };
+        res.status(400).json(logs);
+        return;
+    }
+    const db = await connection_1.connection.getDb();
+    let collection;
+    try {
+        collection = db.collection('student_applications');
+        let _student_application;
+        const _student = new StudentApplication_1.default({
+            studentCollegeId: req.session.authenticationID,
+            studentApplicationName: studentApplicationData.studentApplicationName,
+            studentApplicationDescription: studentApplicationData.studentApplicationDescription,
+            studentApplicationDate: studentApplicationData.studentApplicationDate,
+            studentApplicationOrganizer: studentApplicationData.studentApplicationOrganizer,
+            studentApplicationFile: studentApplicationData.studentApplicationFile,
+        });
+        try {
+            _student_application = await collection.insertOne(_student);
+        }
+        catch (e) {
+            logs = {
+                field: "Student Application Error",
+                message: e
+            };
+            return res.status(400).json({ logs });
+        }
+        if (_student_application.acknowledged) {
+            console.log(_student_application);
+            logs = {
+                field: "Student Application Posted",
+                studentApplicationName: studentApplicationData.studentApplicationName,
+                studentApplicationDescription: studentApplicationData.studentApplicationDescription,
+                studentApplicationDate: studentApplicationData.studentApplicationDescription,
+                studentApplicationOrganizer: studentApplicationData.studentApplicationOrganizer,
+                studentApplicationFile: studentApplicationData.studentApplicationFile,
+            };
+            return res.status(200).json({ logs });
+        }
+        else {
+            logs =
+                {
+                    field: "Unknown Error Occurred",
+                    message: "Better check with administrator",
+                };
+            res.status(400).json({ logs });
+            return { logs };
+        }
+    }
+    catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+};
+const studentGetApplications = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs =
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            };
+        res.status(400).json({ logs });
+        return null;
+    }
+    console.log(req);
+    console.log("Inside Student GET controller");
+    let allApplications;
+    try {
+        const db = await connection_1.connection.getDb();
+        console.log(db);
+        try {
+            allApplications = await db.collection('student_applications').find({ studentCollegeId: req.session.authenticationID }).toArray();
+        }
+        catch (err) {
+            if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err);
+                logs = {
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                };
+                res.status(400).json({ logs });
+                return { logs };
+            }
+            else {
+                res.status(400).json({ err });
+                throw new Error(err);
+            }
+        }
+        res.status(200).json(allApplications);
+        console.log(allApplications);
+    }
+    catch (e) {
+        console.log(e);
+        throw e;
+    }
+};
+const studentGetEvents = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs =
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            };
+        res.status(400).json({ logs });
+        return null;
+    }
+    console.log(req);
+    console.log("Inside Student GET controller");
+    let allEvents;
+    try {
+        const db = await connection_1.connection.getDb();
+        console.log(db);
+        try {
+            allEvents = await db.collection('event').find({}).toArray();
+        }
+        catch (err) {
+            if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err);
+                logs = {
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                };
+                res.status(400).json({ logs });
+                return { logs };
+            }
+            else {
+                res.status(400).json({ err });
+                throw new Error(err);
+            }
+        }
+        res.status(200).json(allEvents);
+        console.log(allEvents);
+    }
+    catch (e) {
+        console.log(e);
+        throw e;
+    }
+};
+const studentGetAdvertisements = async (req, res) => {
+    let logs;
+    if (!req.session.authenticationID) {
+        logs =
+            {
+                field: "Not logged in",
+                message: "Please log in",
+            };
+        res.status(400).json({ logs });
+        return null;
+    }
+    console.log(req);
+    console.log("Inside Student GET controller");
+    let allAdvertisements;
+    try {
+        const db = await connection_1.connection.getDb();
+        console.log(db);
+        try {
+            allAdvertisements = await db.collection('advertisement').find({}).toArray();
+        }
+        catch (err) {
+            if (err instanceof mongodb_1.MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err);
+                logs = {
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                };
+                res.status(400).json({ logs });
+                return { logs };
+            }
+            else {
+                res.status(400).json({ err });
+                throw new Error(err);
+            }
+        }
+        res.status(200).json(allAdvertisements);
+        console.log(allAdvertisements);
+    }
+    catch (e) {
+        console.log(e);
+        throw e;
+    }
+};
 module.exports = {
-    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance
+    studentSignUp, studentLogIn, studentLogOut, me, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements
 };
 //# sourceMappingURL=StudentController.js.map

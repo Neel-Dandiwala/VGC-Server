@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const connection_1 = require("../connection");
 const imgur_1 = require("../imgur");
+const DateFormat_1 = require("../utils/DateFormat");
 require('dotenv').config();
 const uploadImageTrial = async (req, res) => {
     let logs = {
@@ -10,7 +11,7 @@ const uploadImageTrial = async (req, res) => {
     };
     res.status(200).json({ logs });
 };
-const AdminPostController = async (req, res) => {
+const adminSetEvent = async (req, res) => {
     let logs;
     console.log(req.body);
     const eventData = req.body;
@@ -18,6 +19,7 @@ const AdminPostController = async (req, res) => {
     try {
         let _link = await (0, imgur_1.uploadOnImgur)(_filename);
         eventData.eventFile = _link;
+        eventData.eventDate = (0, DateFormat_1.formatDate)((new Date()).toISOString());
     }
     catch (err) {
         logs = {
@@ -61,7 +63,7 @@ const AdminPostController = async (req, res) => {
         throw e;
     }
 };
-const AdminGetEvents = async (req, res) => {
+const adminGetEvent = async (req, res) => {
     console.log(req);
     console.log("Inside Admin GET controller");
     let allevents;
@@ -81,7 +83,54 @@ const AdminGetEvents = async (req, res) => {
         console.log(e);
     }
 };
+const adminSetAdvertisement = async (req, res) => {
+    let logs;
+    console.log(req.body);
+    const advertisementData = req.body;
+    const _filename = req.file.filename;
+    try {
+        let _link = await (0, imgur_1.uploadOnImgur)(_filename);
+        advertisementData.advertisementImageLink = _link;
+        advertisementData.advertisementExpires = (0, DateFormat_1.formatDate)((0, DateFormat_1.addWeeksToDate)(new Date(), 2).toISOString());
+    }
+    catch (err) {
+        logs = {
+            field: "Imgur Error",
+            message: "Better check with administrator"
+        };
+        res.status(400).json(logs);
+        return;
+    }
+    const db = await connection_1.connection.getDb();
+    let collection;
+    try {
+        collection = db.collection('advertisement');
+        let _admin_post;
+        try {
+            _admin_post = await collection.insertOne(advertisementData);
+            logs = {
+                field: "Advertisement Posted on Database",
+                advertisementName: advertisementData.advertisementName,
+                advertisementDescription: advertisementData.advertisementDescription,
+                advertisementExpires: advertisementData.advertisementExpires,
+                advertisementImageLink: advertisementData.advertisementImageLink,
+            };
+            return res.status(200).json({ logs });
+        }
+        catch (e) {
+            logs = {
+                field: "Advertisement Insertion Error",
+                message: e
+            };
+            return res.status(400).json({ logs });
+        }
+    }
+    catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+};
 module.exports = {
-    AdminPostController, AdminGetEvents, uploadImageTrial
+    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement
 };
 //# sourceMappingURL=AdminController.js.map

@@ -53,7 +53,7 @@ const main = async () => {
                 httpOnly: true,
                 sameSite: 'lax',
                 // secure: false,
-                // domain: "http://localhost:8080/",
+                domain: "http://localhost:3000/",
             },
             store: sessionStore,
             unset: 'destroy',

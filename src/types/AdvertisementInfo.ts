@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 
 export class AdvertisementInfo {
-    advertismentTitle: string;
+    advertisementName: string;
     advertisementDescription: string;
     advertisementExpires: string;
     advertisementImageLink: string;

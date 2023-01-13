@@ -4,7 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const { studentSignUp, studentLogIn, me, studentLogOut, studentChangePassword, studentGetBalance } = require('../controllers/StudentController');
+const multer_1 = require("../multer");
+const { studentSignUp, studentLogIn, me, studentLogOut, studentChangePassword, studentGetBalance, studentGetApplications, studentSetApplication, studentGetEvents, studentGetAdvertisements } = require('../controllers/StudentController');
 const router = express_1.default.Router();
 router.post('/student/signup', studentSignUp);
 router.post('/student/login', studentLogIn);
@@ -12,5 +13,9 @@ router.get('/student/me', me);
 router.get('/student/logout', studentLogOut);
 router.get('/student/balance', studentGetBalance);
 router.post('/student/changepassword', studentChangePassword);
+router.post('/student/setapplication', multer_1.uploadCertificate.single('file'), studentSetApplication);
+router.get('/student/getapplications', studentGetApplications);
+router.get('/student/getevents', studentGetEvents);
+router.get('/student/getadvertisements', studentGetAdvertisements);
 module.exports = router;
 //# sourceMappingURL=StudentRoutes.js.map

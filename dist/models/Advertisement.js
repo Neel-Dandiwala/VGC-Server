@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const AdvertisementSchema = new mongoose_1.Schema({
-    advertismentTitle: {
+    advertisementTitle: {
         type: String,
         required: true
     },
