@@ -7,5 +7,8 @@ export class StudentApplicationInfo {
     studentApplicationDate: string;
     studentApplicationOrganizer: string;
     studentApplicationFile: string;
+    studentApplicationCategory: string;
+    studentApplicationStatus?:string;
+    studentApplicationIssuedCoins?: number;
 }
 

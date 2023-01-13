@@ -496,7 +496,7 @@ const studentSetApplication = async (req: Request, res: Response) => {
         return null;
     }
     console.log(req.body)
-    const studentApplicationData = req.body  as Pick<StudentApplicationInfo, "studentApplicationName" | "studentApplicationDescription" | "studentApplicationDate" | "studentApplicationOrganizer" | "studentApplicationFile">
+    const studentApplicationData = req.body  as Pick<StudentApplicationInfo, "studentApplicationName" | "studentApplicationDescription" | "studentApplicationDate" | "studentApplicationOrganizer" | "studentApplicationCategory" | "studentApplicationFile">
     const _filename = req.file.filename
     try {
         let _link = await uploadOnImgur(_filename)
@@ -514,7 +514,7 @@ const studentSetApplication = async (req: Request, res: Response) => {
     let collection;
 
     try {
-        collection = db.collection('student_applications');
+        collection = db.collection('student_application');
         let _student_application;
         const _student: StudentApplicationInfo = new StudentApplication({
             studentCollegeId: req.session.authenticationID,
@@ -522,8 +522,10 @@ const studentSetApplication = async (req: Request, res: Response) => {
             studentApplicationDescription: studentApplicationData.studentApplicationDescription,
             studentApplicationDate: studentApplicationData.studentApplicationDate,
             studentApplicationOrganizer: studentApplicationData.studentApplicationOrganizer,
+            studentApplicationCategory: studentApplicationData.studentApplicationCategory,
             studentApplicationFile: studentApplicationData.studentApplicationFile,
-            
+            studentApplicationStatus: "Pending",
+            studentApplicationIssuedCoins: -1
         })
         try {
             _student_application = await collection.insertOne(_student);
@@ -588,7 +590,7 @@ const studentGetApplications = async (req: Request, res: Response) => {
         console.log(db)
 
         try {
-            allApplications = await db.collection('student_applications').find({ studentCollegeId: req.session.authenticationID}).toArray();
+            allApplications = await db.collection('student_application').find({ studentCollegeId: req.session.authenticationID}).toArray();
             
         } catch (err) {
             if (err instanceof MongoServerError && err.code === 11000) {

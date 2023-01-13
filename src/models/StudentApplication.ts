@@ -30,6 +30,22 @@ const StudentApplicationSchema: Schema = new Schema({
         required: true
     },
 
+    studentApplicationCategory:  {
+        type: String,
+        required: true
+    },
+
+    studentApplicationStatus:  {
+        type: String,
+        required: true
+    },
+
+    studentApplicationIssuedCoins:  {
+        type: Number,
+        required: true
+    },
+
+
 }, {timestamps: true})
 
 export default model<StudentApplicationInfo>("StudentApplication", StudentApplicationSchema);

@@ -26,6 +26,18 @@ const StudentApplicationSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    studentApplicationCategory: {
+        type: String,
+        required: true
+    },
+    studentApplicationStatus: {
+        type: String,
+        required: true
+    },
+    studentApplicationIssuedCoins: {
+        type: Number,
+        required: true
+    },
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("StudentApplication", StudentApplicationSchema);
 //# sourceMappingURL=StudentApplication.js.map
