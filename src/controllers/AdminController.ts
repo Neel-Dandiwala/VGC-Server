@@ -313,6 +313,56 @@ const updateStudentApplication = async (req: Request, res: Response) => {
 
 }
 
+const getStudents = async (req: Request, res: Response) => {
+
+    // console.log(req)
+    let students;
+    try {
+        const db = await connection.getDb();
+        console.log(db)
+
+        try {
+            students = await db.collection('student').find({}).toArray();
+            res.status(200).json({ students })
+            console.log(students)
+        } catch (e) {
+            console.log(e)
+        }
+
+    } catch (e) {
+        console.log(e)
+    }
+
+}
+
+const getSupplyRedeemed = async(req: Request, res:Response) =>{
+    console.log(req)
+    console.log("Inside Admin GetSupplyRedeemed ")
+    // console.log(req)
+    let supply;
+    let redeemed;
+    try {
+        const db = await connection.getDb();
+        console.log(db)
+
+        try {
+            supply = await db.collection('global').findOne({_id:"total_supply"});
+
+        } catch (e) {
+            console.log(e)
+        }
+        try {
+            redeemed = await db.collection('global').findOne({_id:"total_redeemed"});
+
+        } catch (e) {
+            console.log(e)
+        }
+        res.status(200).json({supply,redeemed})
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 module.exports = {
-    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication
+    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed
 }

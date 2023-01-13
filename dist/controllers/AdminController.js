@@ -268,7 +268,51 @@ const updateStudentApplication = async (req, res) => {
         throw e;
     }
 };
+const getStudents = async (req, res) => {
+    let students;
+    try {
+        const db = await connection_1.connection.getDb();
+        console.log(db);
+        try {
+            students = await db.collection('student').find({}).toArray();
+            res.status(200).json({ students });
+            console.log(students);
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+    catch (e) {
+        console.log(e);
+    }
+};
+const getSupplyRedeemed = async (req, res) => {
+    console.log(req);
+    console.log("Inside Admin GetSupplyRedeemed ");
+    let supply;
+    let redeemed;
+    try {
+        const db = await connection_1.connection.getDb();
+        console.log(db);
+        try {
+            supply = await db.collection('global').findOne({ _id: "total_supply" });
+        }
+        catch (e) {
+            console.log(e);
+        }
+        try {
+            redeemed = await db.collection('global').findOne({ _id: "total_redeemed" });
+        }
+        catch (e) {
+            console.log(e);
+        }
+        res.status(200).json({ supply, redeemed });
+    }
+    catch (e) {
+        console.log(e);
+    }
+};
 module.exports = {
-    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication
+    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed
 };
 //# sourceMappingURL=AdminController.js.map
