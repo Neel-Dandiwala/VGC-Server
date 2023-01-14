@@ -23,6 +23,7 @@ const QRCodeGenerator = async (req:Request, res:Response) => {
       width: 300,
     });
     console.log(qrCode)
+    
     // res.setHeader("content-type", "image/png");
     res.status(200).json({});
   }

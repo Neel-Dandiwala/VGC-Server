@@ -793,11 +793,11 @@ const studentCanteenTransfer = async (req: Request, res: Response) => {
             
             collection = db.collection('student');
             studentBurn = await collection.updateOne({ _id:  studentId },
-                { $inc: { studentBalance: (-1 * parseInt(_amount)) }});
+                { $inc: { studentBalance: (-1 * _amount) }});
             
             collection = db.collection('rewarder');
             rewarderMint = await collection.updateOne({ _id:  'canteen' },
-                { $inc: { balance: parseInt(_amount) }});
+                { $inc: { balance: _amount }});
 
         } catch(err) {
             if (err instanceof MongoServerError && err.code === 11000) {
@@ -820,9 +820,9 @@ const studentCanteenTransfer = async (req: Request, res: Response) => {
         if(studentBurn.acknowledged && rewarderMint.acknowledged) {
             collection = db.collection('global');
             await collection.updateOne({ _id:  'total_redeemed' },
-                { $inc: { value: parseInt(_amount) }});
+                { $inc: { value: _amount }});
             await collection.updateOne({ _id:  'total_in_circulation' },
-                { $inc: { value: (-1 * parseInt(_amount)) }});
+                { $inc: { value: (-1 * _amount) }});
             logs = { 
                 field: "Successful Canteen Transfer",
                 message: "Student paid to Canteen"
@@ -833,7 +833,7 @@ const studentCanteenTransfer = async (req: Request, res: Response) => {
         } else if(!studentBurn.acknowledged && rewarderMint.acknowledged) {
             collection = db.collection('rewarder');
             rewarderMint = await collection.updateOne({ _id:  'canteen' },
-                { $inc: { balance: (-1 * parseInt(_amount)) }});
+                { $inc: { balance: (-1 * _amount) }});
             logs = { 
                 field: "Student Burn Error",
                 message: "Student Balance could not be reduced"
@@ -843,7 +843,7 @@ const studentCanteenTransfer = async (req: Request, res: Response) => {
         } else if (studentBurn.acknowledged && !rewarderMint.acknowledged) {
             collection = db.collection('student');
             studentBurn = await collection.updateOne({ _id:  studentId },
-                { $inc: { studentBalance:  parseInt(_amount) }});
+                { $inc: { studentBalance:  _amount }});
             logs = { 
                 field: "Rewarder Mint Error",
                 message: "Coins could not be transferred to rewarder"
@@ -935,11 +935,11 @@ const studentStationeryTransfer = async (req: Request, res: Response) => {
             
             collection = db.collection('student');
             studentBurn = await collection.updateOne({ _id:  studentId },
-                { $inc: { studentBalance: (-1 * parseInt(_amount)) }});
+                { $inc: { studentBalance: (-1 * _amount) }});
             
             collection = db.collection('rewarder');
             rewarderMint = await collection.updateOne({ _id:  'stationery' },
-                { $inc: { balance: parseInt(_amount) }});
+                { $inc: { balance: _amount }});
 
         } catch(err) {
             if (err instanceof MongoServerError && err.code === 11000) {
@@ -962,9 +962,9 @@ const studentStationeryTransfer = async (req: Request, res: Response) => {
         if(studentBurn.acknowledged && rewarderMint.acknowledged) {
             collection = db.collection('global');
             await collection.updateOne({ _id:  'total_redeemed' },
-                { $inc: { value: parseInt(_amount) }});
+                { $inc: { value: _amount}});
             await collection.updateOne({ _id:  'total_in_circulation' },
-                { $inc: { value: (-1 * parseInt(_amount)) }});
+                { $inc: { value: (-1 * _amount) }});
             logs = { 
                 field: "Successful stationery Transfer",
                 message: "Student paid to stationery"
@@ -975,7 +975,7 @@ const studentStationeryTransfer = async (req: Request, res: Response) => {
         } else if(!studentBurn.acknowledged && rewarderMint.acknowledged) {
             collection = db.collection('rewarder');
             rewarderMint = await collection.updateOne({ _id:  'stationery' },
-                { $inc: { balance: (-1 * parseInt(_amount)) }});
+                { $inc: { balance: (-1 * _amount) }});
             logs = { 
                 field: "Student Burn Error",
                 message: "Student Balance could not be reduced"
@@ -985,7 +985,7 @@ const studentStationeryTransfer = async (req: Request, res: Response) => {
         } else if (studentBurn.acknowledged && !rewarderMint.acknowledged) {
             collection = db.collection('student');
             studentBurn = await collection.updateOne({ _id:  studentId },
-                { $inc: { studentBalance:  parseInt(_amount) }});
+                { $inc: { studentBalance:  _amount }});
             logs = { 
                 field: "Rewarder Mint Error",
                 message: "Coins could not be transferred to rewarder"
