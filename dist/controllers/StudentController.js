@@ -493,7 +493,7 @@ const studentSetApplication = async (req, res) => {
             studentApplicationCategory: studentApplicationData.studentApplicationCategory,
             studentApplicationFile: studentApplicationData.studentApplicationFile,
             studentApplicationStatus: "Pending",
-            studentApplicationIssuedCoins: -1
+            studentApplicationIssuedCoins: 0
         });
         try {
             _student_application = await collection.insertOne(_student);

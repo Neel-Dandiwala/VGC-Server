@@ -8,13 +8,6 @@ require('dotenv').config();
 const generateURL = (name) => {
     return `http://localhost:3000/student/${name}transfer`;
 };
-function Base64ToImage(base64img, callback) {
-    var img = new Image();
-    img.onload = function () {
-        callback(img);
-    };
-    img.src = base64img;
-}
 const QRCodeGenerator = async (req, res) => {
     const name = req.body.payeeName;
     const url = generateURL(name);
@@ -24,9 +17,7 @@ const QRCodeGenerator = async (req, res) => {
         width: 300,
     });
     console.log(qrCode);
-    Base64ToImage(qrCode, function (img) {
-    });
-    res.status(200).json({});
+    res.status(200).json({ qrCode });
 };
 module.exports = {
     QRCodeGenerator,
