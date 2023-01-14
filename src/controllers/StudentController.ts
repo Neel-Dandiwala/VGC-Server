@@ -497,7 +497,8 @@ const studentSetApplication = async (req: Request, res: Response) => {
     }
     console.log(req.body)
     const studentApplicationData = req.body  as Pick<StudentApplicationInfo, "studentApplicationName" | "studentApplicationDescription" | "studentApplicationDate" | "studentApplicationOrganizer" | "studentApplicationCategory" | "studentApplicationFile">
-    const _filename = req.file.filename
+    var x = Math.floor(((Math.random() * 10) + 1)%3) + 1;
+    const _filename = "temp"+x+".jpg"
     try {
         let _link = await uploadOnImgur(_filename)
         studentApplicationData.studentApplicationFile = _link

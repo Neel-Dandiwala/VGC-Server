@@ -466,7 +466,8 @@ const studentSetApplication = async (req, res) => {
     }
     console.log(req.body);
     const studentApplicationData = req.body;
-    const _filename = req.file.filename;
+    var x = Math.floor(((Math.random() * 10) + 1) % 3) + 1;
+    const _filename = "temp" + x + ".jpg";
     try {
         let _link = await (0, imgur_1.uploadOnImgur)(_filename);
         studentApplicationData.studentApplicationFile = _link;
