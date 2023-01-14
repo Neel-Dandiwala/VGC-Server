@@ -198,7 +198,7 @@ const updateStudentApplication = async (req: Request, res: Response) => {
         console.log(req.body)
         const studentApplicationId = req.body.id;
         const studentApplicationStatus = req.body.studentApplicationStatus
-        const studentApplicationIssuedCoins = req.body.studentApplicationIssuedCoins
+        const studentApplicationIssuedCoins = + req.body.studentApplicationIssuedCoins
         collection = db.collection('student_application');
         // console.log(student_applications)
         let _student_application;
@@ -244,13 +244,13 @@ const updateStudentApplication = async (req: Request, res: Response) => {
 
             collection = db.collection('student');
             let _student = await collection.updateOne({ _id:  studentCollegeId },
-                { $inc: { studentBalance: parseInt(studentApplicationIssuedCoins) }});
+                { $inc: { studentBalance: studentApplicationIssuedCoins }});
 
             collection = db.collection('transaction');
             let _transaction: TransactionInfo = new Transaction({
                 to: studentCollegeId,
                 from: "admin",
-                amount: parseInt(studentApplicationIssuedCoins),
+                amount: studentApplicationIssuedCoins,
                 timestamp: (new Date()).toISOString()
 
             })
@@ -264,10 +264,10 @@ const updateStudentApplication = async (req: Request, res: Response) => {
                 collection = db.collection('global');
 
                 await collection.updateOne({ _id:  'total_supply' },
-                    { $inc: { value: parseInt(studentApplicationIssuedCoins) }});
+                    { $inc: { value: studentApplicationIssuedCoins }});
 
                 await collection.updateOne({ _id:  'total_in_circulation' },
-                    { $inc: { value: parseInt(studentApplicationIssuedCoins) }});
+                    { $inc: { value: studentApplicationIssuedCoins }});
 
                 res.status(200).json(logs)
                 return
@@ -279,9 +279,9 @@ const updateStudentApplication = async (req: Request, res: Response) => {
                 }
                 collection = db.collection('student');
                 await collection.updateOne({ _id:  studentCollegeId },
-                { $inc: { studentBalance: (-1 * parseInt(studentApplicationIssuedCoins)) }});
+                { $inc: { studentBalance: (-1 * studentApplicationIssuedCoins) }});
                 collection = db.collection('student_application');
-                await collection.updateOne({ _id: new mongoose.Types.ObjectId(studentApplicationId) }, { $set: { studentApplicationStatus: 'Pending', studentApplicationIssuedCoins: -1 } })
+                await collection.updateOne({ _id: new mongoose.Types.ObjectId(studentApplicationId) }, { $set: { studentApplicationStatus: 'Pending', studentApplicationIssuedCoins: 0 } })
                 res.status(400).json(logs)
                 return
 
@@ -294,7 +294,7 @@ const updateStudentApplication = async (req: Request, res: Response) => {
                 collection = db.collection('transaction');
                 await collection.deleteOne({ _id: _transactionAdded.insertedId });
                 collection = db.collection('student_application');
-                await collection.updateOne({ _id: new mongoose.Types.ObjectId(studentApplicationId) }, { $set: { studentApplicationStatus: 'Pending', studentApplicationIssuedCoins: -1 } })
+                await collection.updateOne({ _id: new mongoose.Types.ObjectId(studentApplicationId) }, { $set: { studentApplicationStatus: 'Pending', studentApplicationIssuedCoins: 0 } })
                 res.status(400).json(logs)
                 return
 
@@ -303,7 +303,7 @@ const updateStudentApplication = async (req: Request, res: Response) => {
                     field: "Failed Admin Transaction",
                     message: result.insertedId
                 }
-                await collection.updateOne({ _id: new mongoose.Types.ObjectId(studentApplicationId) }, { $set: { studentApplicationStatus: 'Pending', studentApplicationIssuedCoins: -1 } })
+                await collection.updateOne({ _id: new mongoose.Types.ObjectId(studentApplicationId) }, { $set: { studentApplicationStatus: 'Pending', studentApplicationIssuedCoins: 0 } })
                 res.status(400).json(logs)
                 return
             }
