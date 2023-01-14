@@ -736,7 +736,7 @@ const studentCanteenTransfer = async (req: Request, res: Response) => {
         return null;
     }
 
-    const _amount = req.body.amount;
+    const _amount:number = +req.body.amount 
 
     const db = await connection.getDb();
     let collection = db.collection( 'student' );
@@ -878,7 +878,7 @@ const studentStationeryTransfer = async (req: Request, res: Response) => {
         return null;
     }
 
-    const _amount = req.body.amount;
+    const _amount:number = +req.body.amount 
 
     const db = await connection.getDb();
     let collection = db.collection( 'student' );

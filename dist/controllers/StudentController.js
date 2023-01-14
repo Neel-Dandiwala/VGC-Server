@@ -676,7 +676,7 @@ const studentCanteenTransfer = async (req, res) => {
         res.status(400).json({ logs });
         return null;
     }
-    const _amount = req.body.amount;
+    const _amount = +req.body.amount;
     const db = await connection_1.connection.getDb();
     let collection = db.collection('student');
     try {
@@ -797,7 +797,7 @@ const studentStationeryTransfer = async (req, res) => {
         res.status(400).json({ logs });
         return null;
     }
-    const _amount = req.body.amount;
+    const _amount = +req.body.amount;
     const db = await connection_1.connection.getDb();
     let collection = db.collection('student');
     try {

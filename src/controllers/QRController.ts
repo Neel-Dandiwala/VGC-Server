@@ -13,6 +13,14 @@ const generateURL = (name: string) => {
     return `http://localhost:3000/student/${name}transfer`;
 };
 
+function Base64ToImage(base64img, callback) {
+  var img = new Image();
+  img.onload = function() {
+      callback(img);
+  };
+  img.src = base64img;
+}
+
 const QRCodeGenerator = async (req:Request, res:Response) => {
     //TODO: Add validation
     const name = req.body.payeeName;
@@ -23,7 +31,10 @@ const QRCodeGenerator = async (req:Request, res:Response) => {
       width: 300,
     });
     console.log(qrCode)
-    
+    Base64ToImage(qrCode, function(img) {
+      
+    });
+
     // res.setHeader("content-type", "image/png");
     res.status(200).json({});
   }
