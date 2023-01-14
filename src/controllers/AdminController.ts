@@ -26,7 +26,7 @@ const uploadImageTrial = async (req: Request, res: Response) => {
 const adminSetEvent = async (req: Request, res: Response) => {
     let logs;
     console.log(req.body)
-    const eventData = req.body as Pick<EventInfo, "eventName" | "eventDescription" | "eventVenue" | "eventDate" | "eventStartTime" | "eventEndTime" | "eventCommittee" | "eventContact" | "eventFile" | "eventAmount">
+    const eventData = req.body as Pick<EventInfo, "eventName" | "eventDescription" | "eventVenue" | "eventDate" | "eventStartTime" | "eventEndTime" | "eventCommittee" | "eventContact" | "eventFile" >
     const _filename = req.file.filename
     try {
         let _link = await uploadOnImgur(_filename)
@@ -46,11 +46,11 @@ const adminSetEvent = async (req: Request, res: Response) => {
     let collection;
 
     try {
-        collection = db.collection('global');
-        await collection.updateOne({ _id:  'total_money_left' },
-        { $inc: { value: parseFloat(eventData.eventAmount) }});
-        await collection.updateOne({ _id:  'total_investment' },
-        { $inc: { value: parseFloat(eventData.eventAmount) }});
+        // collection = db.collection('global');
+        // await collection.updateOne({ _id:  'total_money_left' },
+        // { $inc: { value: parseFloat(eventData.eventAmount) }});
+        // await collection.updateOne({ _id:  'total_investment' },
+        // { $inc: { value: parseFloat(eventData.eventAmount) }});
 
         collection = db.collection('event');
         let _admin_post;
@@ -484,6 +484,29 @@ const flushStationery =  async(req: Request, res:Response) => {
     }
 }
 
+const getRewarderBalance =  async(req: Request, res:Response) => {
+
+    console.log(req)
+    let logs;
+    const db = await connection.getDb();
+    let collection;
+    try {
+        collection = db.collection('rewarder');
+        let _canteen = await collection.findOne({ _id:  'canteen' })
+        let _canteenBalance = _canteen.balance
+        let _stationery = await collection.findOne({ _id:  'stationery' })
+        let _stationeryBalance = _stationery.balance
+
+        res.status(200).json({ _canteenBalance, _stationeryBalance})
+        return
+        
+    } catch (e) {
+        res.status(400).json({ e });
+        throw e;
+    }
+
+}
+
 module.exports = {
-    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery
+    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery, getRewarderBalance
 }

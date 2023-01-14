@@ -7,6 +7,8 @@ import argon2 from "argon2";
 import {connection} from "../connection";
 import {MongoServerError} from 'mongodb'
 import * as nodemailer from 'nodemailer' 
+var base64ToImage = require('base64-to-image');
+
 require('dotenv').config()
 
 const generateURL = (name: string) => {
@@ -23,6 +25,11 @@ const QRCodeGenerator = async (req:Request, res:Response) => {
       width: 300,
     });
     console.log(qrCode)
+    const path = './public/'+'qr'+'.png'
+
+    const imgdata = qrCode
+    base64ToImage(imgdata,path);
+
     
     // res.setHeader("content-type", "image/png");
     res.status(200).json({qrCode});

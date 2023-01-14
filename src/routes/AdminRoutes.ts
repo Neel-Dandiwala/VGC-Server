@@ -1,7 +1,7 @@
 import express from 'express';
 import { uploadImage } from '../multer'
 
-const { adminSetEvent ,adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery } = require('../controllers/AdminController')
+const { adminSetEvent ,adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery, getRewarderBalance } = require('../controllers/AdminController')
 
 const router = express.Router();
 
@@ -14,6 +14,7 @@ router.get('/admin/getstudents', getStudents)
 router.get('/admin/getsupplyredeemed', getSupplyRedeemed)
 router.get('/admin/flushcanteen', flushCanteen)
 router.get('/admin/flushstationery', flushStationery)
+router.get('/admin/getrewarderbalance', getRewarderBalance)
 
 router.post('/uploadimage', uploadImage.single('file'), uploadImageTrial);
 

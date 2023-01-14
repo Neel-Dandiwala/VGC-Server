@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const qrcode_1 = __importDefault(require("qrcode"));
+var base64ToImage = require('base64-to-image');
 require('dotenv').config();
 const generateURL = (name) => {
     return `http://localhost:3000/student/${name}transfer`;
@@ -17,6 +18,9 @@ const QRCodeGenerator = async (req, res) => {
         width: 300,
     });
     console.log(qrCode);
+    const path = './public/' + 'qr' + '.png';
+    const imgdata = qrCode;
+    base64ToImage(imgdata, path);
     res.status(200).json({ qrCode });
 };
 module.exports = {
