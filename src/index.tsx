@@ -14,7 +14,7 @@ declare module 'express-session' {
 }
 
 const main = async () => {
-    const PORT= process.env.PORT || 3000;
+    const PORT= 3000;
 
 
     await connection.connectToServer(async function( err:any, client:any ) {
@@ -63,13 +63,15 @@ const main = async () => {
     ));
 
     app.use(express.json());
+  
     app.use(require('./routes/StudentRoutes'));
     app.use(require('./routes/QRRoutes'));
     app.use(require('./routes/AdminRoutes'));
+    app.use(require('./routes/CommitteeRoutes'));
     app.use(fileUpload());
 
     app.get("/healthz", (_, res) => {
-        res.send("Health Checkup");
+        res.send("Health Checkup 123");
     })
 
 

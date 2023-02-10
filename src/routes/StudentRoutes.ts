@@ -17,5 +17,4 @@ router.get('/student/getadvertisements', studentGetAdvertisements)
 router.post('/student/canteentransfer', studentCanteenTransfer)
 router.post('/student/stationerytransfer', studentStationeryTransfer)
 
-
 module.exports = router;

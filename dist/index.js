@@ -12,7 +12,7 @@ const connection_1 = require("./connection");
 const fileUpload = require('express-fileupload');
 require('dotenv').config();
 const main = async () => {
-    const PORT = process.env.PORT || 3000;
+    const PORT = 3000;
     await connection_1.connection.connectToServer(async function (err, client) {
         if (err)
             console.log(err);
@@ -51,9 +51,10 @@ const main = async () => {
     app.use(require('./routes/StudentRoutes'));
     app.use(require('./routes/QRRoutes'));
     app.use(require('./routes/AdminRoutes'));
+    app.use(require('./routes/CommitteeRoutes'));
     app.use(fileUpload());
     app.get("/healthz", (_, res) => {
-        res.send("Health Checkup");
+        res.send("Health Checkup 123");
     });
     app.listen(PORT, () => {
         console.log("Server started on localhost:3000");

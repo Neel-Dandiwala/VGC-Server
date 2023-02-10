@@ -12,7 +12,6 @@ import StudentApplication from '../models/StudentApplication';
 require('dotenv').config()
 
 
-
 // const collection = connection.db('rrrdatabase').collection('test');
 const studentSignUp = async(req:Request, res:Response) => {
 
@@ -33,7 +32,6 @@ const studentSignUp = async(req:Request, res:Response) => {
                     message: "Student does not exist",
                 }
             ]
-
             res.status(400).json({ logs });
             return {logs}; 
         }
@@ -73,11 +71,9 @@ const studentSignUp = async(req:Request, res:Response) => {
                 }]
                 res.status(400).json({ logs });
                 return {logs};
-                
             }
             else {
                 res.status(400).json({ err });
-                
                 throw new Error(err)
             }
         }
@@ -176,7 +172,7 @@ const studentLogIn = async(req:Request, res:Response) => {
                             message: "Student never signed up before",
                         }
                     ]
-                
+                 
                     res.status(400).json({ logs });
                     return {logs}; 
                 }
