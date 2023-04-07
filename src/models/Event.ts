@@ -36,6 +36,10 @@ const EventSchema: Schema = new Schema({
         type: String,
         required: true
     },
+    eventStatus:  {
+        type: String,
+        required: true
+    },
 
     eventContact:  {
         type: String,

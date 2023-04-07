@@ -5,12 +5,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = require("../multer");
-const { adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery, getRewarderBalance } = require('../controllers/AdminController');
+const { adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery, getRewarderBalance, adminGetAdvertisements, updateAdminAdvertisement, updateAdminEvent, adminGetSponserships, updateAdminSponsershipStatus } = require('../controllers/AdminController');
 const router = express_1.default.Router();
 router.post('/admin/setevent', multer_1.uploadImage.single('file'), adminSetEvent);
 router.get('/admin/getevents', adminGetEvent);
 router.get('/admin/getstudentapplications', adminGetStudentApplications);
 router.post('/admin/setadvertisement', multer_1.uploadImage.single('file'), adminSetAdvertisement);
+router.get('/admin/getadvertisements', adminGetAdvertisements);
+router.post('/admin/updateadvertisement', updateAdminAdvertisement);
+router.post('/admin/updateevent', updateAdminEvent);
+router.get('/admin/getsponserships', adminGetSponserships);
+router.post('/admin/updatesponsership', updateAdminSponsershipStatus);
 router.post('/admin/updatestudentapplication', updateStudentApplication);
 router.get('/admin/getstudents', getStudents);
 router.get('/admin/getsupplyredeemed', getSupplyRedeemed);

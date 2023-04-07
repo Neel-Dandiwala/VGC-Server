@@ -30,6 +30,10 @@ const EventSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    eventStatus: {
+        type: String,
+        required: true
+    },
     eventContact: {
         type: String,
         required: true

@@ -10,4 +10,5 @@ export class EventInfo {
     eventCommittee: string;
     eventContact: string;
     eventFile?: string;
+    eventStatus:string;
 }

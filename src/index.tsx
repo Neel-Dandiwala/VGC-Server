@@ -71,7 +71,7 @@ const main = async () => {
     app.use(fileUpload());
 
     app.get("/healthz", (_, res) => {
-        res.send("Health Checkup 123");
+        res.send("Health Checkup 1234");
     })
 
 

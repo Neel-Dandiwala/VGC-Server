@@ -54,7 +54,7 @@ const main = async () => {
     app.use(require('./routes/CommitteeRoutes'));
     app.use(fileUpload());
     app.get("/healthz", (_, res) => {
-        res.send("Health Checkup 123");
+        res.send("Health Checkup 1234");
     });
     app.listen(PORT, () => {
         console.log("Server started on localhost:3000");

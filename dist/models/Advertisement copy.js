@@ -18,18 +18,6 @@ const AdvertisementSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    advertisementAmount: {
-        type: String,
-        required: true
-    },
-    advertisementStatus: {
-        type: String,
-        required: true
-    },
-    advertisement_committee_email: {
-        type: String,
-        required: true
-    }
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("Advertisement", AdvertisementSchema);
-//# sourceMappingURL=Advertisement.js.map
+//# sourceMappingURL=Advertisement%20copy.js.map

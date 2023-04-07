@@ -25,8 +25,7 @@ const uploadImageTrial = async (req: Request, res: Response) => {
 
 const adminSetEvent = async (req: Request, res: Response) => {
     let logs;
-    console.log(req.body)
-    const eventData = req.body as Pick<EventInfo, "eventName" | "eventDescription" | "eventVenue" | "eventDate" | "eventStartTime" | "eventEndTime" | "eventCommittee" | "eventContact" | "eventFile" >
+    const eventData = req.body as Pick<EventInfo, "eventName" | "eventDescription" | "eventVenue" | "eventDate" | "eventStartTime" | "eventEndTime" | "eventCommittee" | "eventContact" | "eventFile" | "eventStatus">
     const _filename = req.file.filename
     try {
         let _link = await uploadOnImgur(_filename)
@@ -88,7 +87,6 @@ const adminSetEvent = async (req: Request, res: Response) => {
 
 const adminGetEvent = async (req: Request, res: Response) => {
 
-    console.log(req)
     console.log("Inside Admin GET controller")
     // console.log(req)
     let allevents;
@@ -112,8 +110,7 @@ const adminGetEvent = async (req: Request, res: Response) => {
 
 const adminSetAdvertisement = async (req: Request, res: Response) => {
     let logs;
-    console.log(req.body)
-    const advertisementData = req.body as Pick<AdvertisementInfo, "advertisementName" | "advertisementDescription" | "advertisementExpires" | "advertisementImageLink" | "advertisementAmount">
+    const advertisementData = req.body as Pick<AdvertisementInfo, "advertisementName" | "advertisementDescription" | "advertisementExpires" | "advertisementImageLink" | "advertisementAmount" | "advertisementStatus" | "advertisement_committee_email">
     const _filename = req.file.filename
     try {
         let _link = await uploadOnImgur(_filename)
@@ -166,14 +163,280 @@ const adminSetAdvertisement = async (req: Request, res: Response) => {
         throw e;
     }
 }
+const adminGetAdvertisements = async (req: Request, res: Response) => {
+    // console.log(req)
+    let allAdvertisements;
+    try {
+        const db = await connection.getDb();
+        console.log(db)
+
+        try {
+            allAdvertisements = await db.collection('advertisement').find({}).toArray();
+            res.status(200).json(allAdvertisements)
+            console.log(allAdvertisements)
+        } catch (e) {
+            console.log(e)
+        }
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+const adminGetSponserships = async (req: Request, res: Response) => {
+    // console.log(req)
+    let allSponserships;
+    try {
+        const db = await connection.getDb();
+        console.log(db)
+
+        try {
+            allSponserships = await db.collection('sponsership').find({}).toArray();
+            res.status(200).json(allSponserships)
+            console.log(allSponserships)
+        } catch (e) {
+            console.log(e)
+        }
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+
+const updateAdminSponsershipStatus = async (req: Request, res: Response) => {
+    let logs;
+    const db = await connection.getDb();
+
+    let collection;
+    try {
+
+        const sponsershipId = req.body.id;
+        const sponsershipStatus = req.body.sponsershipStatus
+        const sponsershipIssuedCoins = parseInt(req.body.sponserAmount)
+        console.log("Amount .......")
+        console.log(sponsershipIssuedCoins)
+        collection = db.collection('sponsership');
+        // console.log(student_applications)
+        let _sponsershipform;
+        try {
+            _sponsershipform = await collection.findOne({ _id: new mongoose.Types.ObjectId(sponsershipId) })
+            console.log(_sponsershipform)
+            if (_sponsershipform === null) {
+                logs = {
+                    field: "Sponsership Form  Not Found",
+                    message: "Sponsership Form  Not Found ",
+                }
+
+                res.status(400).json({ logs });
+                return { logs };
+            }
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return { logs };
+
+            }
+            else {
+                res.status(400).json({ err });
+                return;
+                // throw new Error(err)
+            }
+        }
+
+        //Update data
+        let result = await collection.updateOne({ _id: new mongoose.Types.ObjectId(sponsershipId) }, { $set: { sponsershipStatus: sponsershipStatus } })
+        if (result.acknowledged) {
+            logs = {
+                field: "SponserShip Form Updated",
+                message: sponsershipId
+            }
+            let committeeId = _sponsershipform.sponser_committee_email
+
+            collection = db.collection('committee');
+            let _student = await collection.updateOne({ committeeEmail:  committeeId },
+                { $inc: { committeeBalance: sponsershipIssuedCoins }});
+
+            collection = db.collection('transaction');
+            let _transaction: TransactionInfo = new Transaction({
+                to: committeeId,
+                from: "admin",
+                amount: sponsershipIssuedCoins,
+                timestamp: (new Date()).toISOString()
+
+            })
+            let _transactionAdded = await collection.insertOne(_transaction);
+
+            if(_student.acknowledged && _transactionAdded.acknowledged) {
+                logs = {
+                    field: "Successful Admin Transaction",
+                    message: _transactionAdded.insertedId
+                }
+                collection = db.collection('global');
+
+                await collection.updateOne({ _id:  'total_supply' },
+                    { $inc: { value: sponsershipIssuedCoins }});
+
+                await collection.updateOne({ _id:  'total_in_circulation' },
+                    { $inc: { value: sponsershipIssuedCoins }});
+            res.status(200).json(logs)
+            return
+        } else {
+            logs = {
+                field: "Sponsership Updation Error",
+                message:"Error while Updating SponserShip Form"
+            }
+            res.status(400).json(logs)
+        }
+        }
+    } catch (e) {
+        res.status(400).json({ message: e });
+        throw e;
+    }
+}
+
+const updateAdminAdvertisement = async (req: Request, res: Response) => {
+    let logs;
+    const db = await connection.getDb();
+
+    let collection;
+    try {
+
+        const advertisementId = req.body.id;
+        const advertisementStatus = req.body.advertisementStatus
+        collection = db.collection('advertisement');
+        // console.log(student_applications)
+        let _advertisement;
+        try {
+            _advertisement = await collection.findOne({ _id: new mongoose.Types.ObjectId(advertisementId) })
+            console.log(_advertisement)
+            if (_advertisement === null) {
+                logs = {
+                    field: "Advertisement  Not Found",
+                    message: "Advertisement  Not Found ",
+                }
+
+                res.status(400).json({ logs });
+                return { logs };
+            }
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return { logs };
+
+            }
+            else {
+                res.status(400).json({ err });
+                return;
+                // throw new Error(err)
+            }
+        }
+
+        //Update data
+        let result = await collection.updateOne({ _id: new mongoose.Types.ObjectId(advertisementId) }, { $set: { advertisementStatus: advertisementStatus } })
+        if (result.acknowledged) {
+            logs = {
+                field: "Student Application Updated",
+                message: advertisementId
+            }
+            res.status(200).json(logs)
+            return
+        } else {
+            logs = {
+                field: "Advertisement Updation Error",
+                message:"Error while Updating Student Application"
+            }
+            res.status(400).json(logs)
+        }
+    } catch (e) {
+        res.status(400).json({ message: e });
+        throw e;
+    }
+
+}
+const updateAdminEvent = async (req: Request, res: Response) => {
+    let logs;
+    const db = await connection.getDb();
+
+    let collection;
+    try {
+
+        const eventId = req.body.id;
+        const eventStatus = req.body.eventStatus
+        collection = db.collection('event');
+        // console.log(student_applications)
+        let _event;
+        try {
+            _event = await collection.findOne({ _id: new mongoose.Types.ObjectId(eventId) })
+            console.log(_event)
+            if (_event === null) {
+                logs = {
+                    field: "Advertisement  Not Found",
+                    message: "Advertisement  Not Found ",
+                }
+
+                res.status(400).json({ logs });
+                return { logs };
+            }
+        } catch (err) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                console.error("# Duplicate Data Found:\n", err)
+                logs = [{
+                    field: "Unexpected Mongo Error",
+                    message: "Default Message"
+                }]
+                res.status(400).json({ logs });
+                return { logs };
+
+            }
+            else {
+                res.status(400).json({ err });
+                return;
+                // throw new Error(err)
+            }
+        }
+
+        //Update data
+        let result = await collection.updateOne({ _id: new mongoose.Types.ObjectId(eventId) }, { $set: { eventStatus: eventStatus } })
+        if (result.acknowledged) {
+            logs = {
+                field: "Student Application Updated",
+                message: eventId
+            }
+            res.status(200).json(logs)
+            return
+        } else {
+            logs = {
+                field: "Advertisement Updation Error",
+                message:"Error while Updating Student Application"
+            }
+            res.status(400).json(logs)
+        }
+    } catch (e) {
+        res.status(400).json({ message: e });
+        throw e;
+    }
+
+}
+
+
+
 
 const adminGetStudentApplications = async (req: Request, res: Response) => {
-    console.log(req)
     // console.log(req)
     let allStudentApplications;
     try {
         const db = await connection.getDb();
-        console.log(db)
+        console.log(db) 
 
         try {
             allStudentApplications = await db.collection('student_application').find({}).toArray();
@@ -195,10 +458,9 @@ const updateStudentApplication = async (req: Request, res: Response) => {
     let collection;
     try {
 
-        console.log(req.body)
         const studentApplicationId = req.body.id;
         const studentApplicationStatus = req.body.studentApplicationStatus
-        const studentApplicationIssuedCoins = + req.body.studentApplicationIssuedCoins
+        const studentApplicationIssuedCoins = req.body.studentApplicationIssuedCoins
         collection = db.collection('student_application');
         // console.log(student_applications)
         let _student_application;
@@ -231,7 +493,6 @@ const updateStudentApplication = async (req: Request, res: Response) => {
                 // throw new Error(err)
             }
         }
-
         //Update data
         let result = await collection.updateOne({ _id: new mongoose.Types.ObjectId(studentApplicationId) }, { $set: { studentApplicationStatus: studentApplicationStatus, studentApplicationIssuedCoins: studentApplicationIssuedCoins } })
         if (result.acknowledged) {
@@ -347,7 +608,6 @@ const getStudents = async (req: Request, res: Response) => {
 }
 
 const getSupplyRedeemed = async(req: Request, res:Response) =>{
-    console.log(req)
     console.log("Inside Admin GetSupplyRedeemed ")
     // console.log(req)
     let supply;
@@ -375,7 +635,6 @@ const getSupplyRedeemed = async(req: Request, res:Response) =>{
 }
 
 const flushCanteen =  async(req: Request, res:Response) => {
-    console.log(req)
     let logs;
     const db = await connection.getDb();
     let collection;
@@ -430,7 +689,6 @@ const flushCanteen =  async(req: Request, res:Response) => {
 }
 
 const flushStationery =  async(req: Request, res:Response) => {
-    console.log(req)
     let logs;
     const db = await connection.getDb();
     let collection;
@@ -486,7 +744,6 @@ const flushStationery =  async(req: Request, res:Response) => {
 
 const getRewarderBalance =  async(req: Request, res:Response) => {
 
-    console.log(req)
     let logs;
     const db = await connection.getDb();
     let collection;
@@ -508,5 +765,5 @@ const getRewarderBalance =  async(req: Request, res:Response) => {
 }
 
 module.exports = {
-    adminSetEvent, adminGetEvent, uploadImageTrial, adminSetAdvertisement, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery, getRewarderBalance
+    adminSetEvent, adminGetEvent, updateAdminAdvertisement,updateAdminSponsershipStatus,updateAdminEvent,uploadImageTrial, adminSetAdvertisement,adminGetAdvertisements,adminGetSponserships, adminGetStudentApplications, updateStudentApplication, getStudents, getSupplyRedeemed, flushCanteen, flushStationery, getRewarderBalance
 }

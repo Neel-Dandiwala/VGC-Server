@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 
-export class AdvertisementInfo {
+export class CommitteeAdvertisementInfo {
     advertisementName: string;
     advertisementDescription: string;
     advertisementExpires: string;

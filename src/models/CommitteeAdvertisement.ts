@@ -1,7 +1,7 @@
-import { AdvertisementInfo } from "../types/AdvertisementInfo";
+import { CommitteeAdvertisementInfo } from "../types/CommitteeAdvertisementInfo";
 import { model, Schema } from "mongoose";
 
-const AdvertisementSchema: Schema = new Schema({
+const CommitteeAdvertisementSchema: Schema = new Schema({
     advertisementTitle: {
         type: String,
         required: true
@@ -31,7 +31,8 @@ const AdvertisementSchema: Schema = new Schema({
     advertisement_committee_email:  {
         type: String,
         required: true
-    }
+    },
+    
 }, {timestamps: true})
 
-export default model<AdvertisementInfo>("Advertisement", AdvertisementSchema);
+export default model<CommitteeAdvertisementInfo>("CommitteeAdvertisement", CommitteeAdvertisementSchema);
